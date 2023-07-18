@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+// имя пакета, в результирующем go-файле это сохраниться
+package rpc_news;
+
+option go_package = "../rpc";
+
+/* message FullNew {
+    
+    int64 ID = 1; // номер записи
+    // заголовок публикации
+ 	string Title =2 ;
+     string  Description =3 ;   // содержание публикации
+     int64 Time  = 4;           // время публикации
+     string Url  = 5;        // ссылка на источник
+	int64 Hash =6; //crc64
+} */
+
+
+
+message ShortNew {
+    // номер записи
+    int64 ID = 1;
+    // заголовок публикации
+ 	string Title =2 ;
+     string  Description =3 ;   // содержание публикации
+     int64 Time  = 4;           // время публикации
+     string Url  = 5;        // ссылка на источник
+     int64 Hash = 6 ;  //Хеш  новости
+}
+
+message Forlist {
+   //int32 count = 1 ; 
+}
+
+message Page{
+    int32 Page =1;
+    int32 offset =2;
+}
+message Id{
+    int64 Page =1;
+}
+
+message ArrayShortNews{
+    repeated ShortNew Sl = 1;
+}
+
+message Result {
+     bool ret = 1;
+     string error =2;
+}
+
+service NewsService {
+    // add news
+    rpc  AddNew (ShortNew) returns (Result){}
+    rpc AddNews(stream ArrayShortNews )returns (Result) {}
+    //list news
+    rpc List(Forlist) returns (stream ArrayShortNews) {}  // вернуть список новостей
+
+    //вернуть  список новостей на странице 
+    rpc ListPage(Page) returns (stream ArrayShortNews) {}
+    
+ }
