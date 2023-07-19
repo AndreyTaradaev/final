@@ -67,7 +67,7 @@ func (c *rssServiceClient) AddNews(ctx context.Context, opts ...grpc.CallOption)
 }
 
 type RssService_AddNewsClient interface {
-	Send(*ArrayShortNews) error
+	Send(*ShortNew) error
 	CloseAndRecv() (*Result, error)
 	grpc.ClientStream
 }
@@ -76,7 +76,7 @@ type rssServiceAddNewsClient struct {
 	grpc.ClientStream
 }
 
-func (x *rssServiceAddNewsClient) Send(m *ArrayShortNews) error {
+func (x *rssServiceAddNewsClient) Send(m *ShortNew) error {
 	return x.ClientStream.SendMsg(m)
 }
 
@@ -107,7 +107,7 @@ func (c *rssServiceClient) List(ctx context.Context, in *Forlist, opts ...grpc.C
 }
 
 type RssService_ListClient interface {
-	Recv() (*ArrayShortNews, error)
+	Recv() (*ShortNew, error)
 	grpc.ClientStream
 }
 
@@ -115,8 +115,8 @@ type rssServiceListClient struct {
 	grpc.ClientStream
 }
 
-func (x *rssServiceListClient) Recv() (*ArrayShortNews, error) {
-	m := new(ArrayShortNews)
+func (x *rssServiceListClient) Recv() (*ShortNew, error) {
+	m := new(ShortNew)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -139,7 +139,7 @@ func (c *rssServiceClient) ListPage(ctx context.Context, in *Page, opts ...grpc.
 }
 
 type RssService_ListPageClient interface {
-	Recv() (*ArrayShortNews, error)
+	Recv() (*ShortNew, error)
 	grpc.ClientStream
 }
 
@@ -147,8 +147,8 @@ type rssServiceListPageClient struct {
 	grpc.ClientStream
 }
 
-func (x *rssServiceListPageClient) Recv() (*ArrayShortNews, error) {
-	m := new(ArrayShortNews)
+func (x *rssServiceListPageClient) Recv() (*ShortNew, error) {
+	m := new(ShortNew)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -222,7 +222,7 @@ func _RssService_AddNews_Handler(srv interface{}, stream grpc.ServerStream) erro
 
 type RssService_AddNewsServer interface {
 	SendAndClose(*Result) error
-	Recv() (*ArrayShortNews, error)
+	Recv() (*ShortNew, error)
 	grpc.ServerStream
 }
 
@@ -234,8 +234,8 @@ func (x *rssServiceAddNewsServer) SendAndClose(m *Result) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *rssServiceAddNewsServer) Recv() (*ArrayShortNews, error) {
-	m := new(ArrayShortNews)
+func (x *rssServiceAddNewsServer) Recv() (*ShortNew, error) {
+	m := new(ShortNew)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -251,7 +251,7 @@ func _RssService_List_Handler(srv interface{}, stream grpc.ServerStream) error {
 }
 
 type RssService_ListServer interface {
-	Send(*ArrayShortNews) error
+	Send(*ShortNew) error
 	grpc.ServerStream
 }
 
@@ -259,7 +259,7 @@ type rssServiceListServer struct {
 	grpc.ServerStream
 }
 
-func (x *rssServiceListServer) Send(m *ArrayShortNews) error {
+func (x *rssServiceListServer) Send(m *ShortNew) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -272,7 +272,7 @@ func _RssService_ListPage_Handler(srv interface{}, stream grpc.ServerStream) err
 }
 
 type RssService_ListPageServer interface {
-	Send(*ArrayShortNews) error
+	Send(*ShortNew) error
 	grpc.ServerStream
 }
 
@@ -280,7 +280,7 @@ type rssServiceListPageServer struct {
 	grpc.ServerStream
 }
 
-func (x *rssServiceListPageServer) Send(m *ArrayShortNews) error {
+func (x *rssServiceListPageServer) Send(m *ShortNew) error {
 	return x.ServerStream.SendMsg(m)
 }
 

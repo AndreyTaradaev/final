@@ -12,23 +12,22 @@ import (
 // загружает новости из массива urls.
 func LoadNews(urls []string, min int) {
 	logger := logs.New()
-	logger.Info("запуск загрузки новостей")
+	logger.Info("запуск потока загрузки новостей")
 	if len(urls) == 0 {
 		logger.Warn("список серверов новостей пуст!")
 		return
 	}
-	chTime := time.After(time.Second * time.Duration(min))
-
-	func() {
-		for {
-			select {
-			case <-chTime:
-				for _, v := range urls {
-					go Rss(v)
-				}
+	
+	for {
+		select {
+		case <-time.After(time.Minute * time.Duration(min)):// time.After вызывается 1 раз поэтому в цикле
+			logger.Debugf("get event Time for strt load RSS")
+			for _, v := range urls {
+				go Rss(v)
 			}
 		}
-	}()
+	}
+
 }
 
 // загрузка новостей с сервера  и передача по RPC

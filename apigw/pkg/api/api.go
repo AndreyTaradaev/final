@@ -12,15 +12,21 @@ import (
 
 type API struct {	
 	r  *mux.Router
+	newserver  *Dial 
+
 }
 
 // Конструктор API.
-func New() *API {
-	a := API{r: mux.NewRouter()}
+func New() (*API,error ) {
+	a := API{r: mux.NewRouter(),newserver: NewClient() }
 	a.endpoints()
 	logger := logs.New()
 	logger.Debug("Init router http")
-	return &a
+	err := a.newserver.Connect("") 
+	if(err != nil){
+		return  nil,err
+	}
+	return &a,nil
 }
 
 // Router возвращает маршрутизатор для использования

@@ -2,7 +2,8 @@
    "rss":[
       "https://habr.com/ru/rss/hub/go/all/?fl=ru",
       "https://habr.com/ru/rss/best/daily/?fl=ru",
-      "https://cprss.s3.amazonaws.com/golangweekly.com.xml"
+      "https://cprss.s3.amazonaws.com/golangweekly.com.xml",
+	  "https://lenta.ru/rss"
    ],
    "request_period": 2,   	
 	  "newsport" : 10000,    

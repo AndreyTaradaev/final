@@ -31,3 +31,23 @@ time="19-Jul-2023 10:14:10.71910" level=fatal msg="не указано подк�
 time="19-Jul-2023 10:16:59.71910" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
 time="19-Jul-2023 10:16:59.71910" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
 time="19-Jul-2023 10:16:59.71910" level=fatal msg="cannot parse `\"123123123\";  go run ./news/cmd/newscmd.go   --config  e:\\Go\\skilfactory\\module40\\final\\news\\cmd\\config.json --debug`: failed to parse as DSN (invalid dsn)" func="main.main()" file="newscmd.go:41" app=newscmd
+time="19-Jul-2023 10:25:53.71910" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="19-Jul-2023 10:25:53.71910" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
+time="19-Jul-2023 10:25:53.71910" level=fatal msg="не указано подключение к БД" func="main.main()" file="newscmd.go:41" app=newscmd
+time="19-Jul-2023 10:26:34.71910" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="19-Jul-2023 10:26:34.71910" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
+time="19-Jul-2023 10:26:34.71910" level=fatal msg="cannot parse `\"postgres://postgres:xxxxxx@172.16.0.44:5432/gonews\";  go run ./news/cmd/newscmd.go   --config  e:\\Go\\skilfactory\\module40\\final\\news\\cmd\\config.json --debug`: failed to parse as DSN (invalid dsn)" func="main.main()" file="newscmd.go:41" app=newscmd
+time="19-Jul-2023 10:27:26.71910" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="19-Jul-2023 10:27:27.71910" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
+time="19-Jul-2023 10:27:27.71910" level=fatal msg="failed to connect to `host=172.16.0.44 user=postgres database=gonews;  go run ./news/cmd/newscmd.go   --config  e:\\Go\\skilfactory\\module40\\final\\news\\cmd\\config.json --debug`: server error (ВАЖНО: база данных \"gonews;  go run ./news/cmd/newscmd.go   --config  e:\\Go\\skilfac\" не существует (SQLSTATE 3D000))" func="main.main()" file="newscmd.go:41" app=newscmd
+time="19-Jul-2023 10:28:02.71910" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="19-Jul-2023 10:28:02.71910" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
+time="19-Jul-2023 10:28:02.71910" level=fatal msg="failed to connect to `host=172.16.0.44 user=postgres database=gonews;  go run ./news/cmd/newscmd.go   --config  e:\\Go\\skilfactory\\module40\\final\\news\\cmd\\config.json --debug`: server error (ВАЖНО: база данных \"gonews;  go run ./news/cmd/newscmd.go   --config  e:\\Go\\skilfac\" не существует (SQLSTATE 3D000))" func="main.main()" file="newscmd.go:41" app=newscmd
+time="19-Jul-2023 10:29:02.71910" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="19-Jul-2023 10:29:02.71910" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
+time="19-Jul-2023 10:29:02.71910" level=fatal msg="failed to connect to `host=172.16.0.44 user=postgres database=gonews;  go run ./news/cmd/newscmd.go   --config  e:\\Go\\skilfactory\\module40\\final\\news\\cmd\\config.json --debug`: server error (ВАЖНО: база данных \"gonews;  go run ./news/cmd/newscmd.go   --config  e:\\Go\\skilfac\" не существует (SQLSTATE 3D000))" func="main.main()" file="newscmd.go:41" app=newscmd
+time="19-Jul-2023 10:30:31.71910" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="19-Jul-2023 10:30:31.71910" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
+time="19-Jul-2023 10:49:18.71910" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="19-Jul-2023 10:49:18.71910" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
+time="19-Jul-2023 10:49:29.71910" level=debug msg="Закрыли подключение к БД" func="gateway/news/pkg/storage.(*DB).Close()" file="storage.go:43" app=newscmd

@@ -43,8 +43,12 @@ func main() {
 	log.Debugln("loaded config ", fmt.Sprintf("%#v", conf))
 	// запускаем загрузку новостей
 
-	rss.LoadNews(conf.Urls() , conf.Period())
-	api := api.New() 
+	go rss.LoadNews(conf.Urls() , conf.Period())
+
+	api,err := api.New() 
+	if(err != nil){
+		log.Fatal(err)
+	}
 
 	Port := fmt.Sprintf(":%d",conf.Port())
 	err  =http.ListenAndServe(Port, api.Router())

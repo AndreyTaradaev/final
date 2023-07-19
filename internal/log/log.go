@@ -36,7 +36,7 @@ var logger *logrus.Logger
 func InitConfig(dir string, debug bool) {
 	exename := tools.FileNamewithoutExt(os.Args[0])	
 	tf := logrus.TextFormatter{}
-	tf.TimestampFormat ="02-Jan-2006 15:04:05.123"
+	tf.TimestampFormat ="02-Jan-2006 15:04:05.00"
 	if len(dir) == 0 { // 
 		logger.SetOutput(os.Stdout)
 		tf.ForceColors = true

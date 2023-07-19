@@ -5,8 +5,10 @@ import (
 	"errors"
 	"os"
 	"github.com/jackc/pgx/v4/pgxpool"
+	logs "gateway/internal/log"
+	"time"
 	//rpc "gateway/internal/rpc"
-	"fmt"
+	//"fmt"
 )
 
 
@@ -15,36 +17,34 @@ type DB struct {
 	pool *pgxpool.Pool
 }
 
-func New() (*DB, error) {
-	env := os.Environ() 
-for _, v := range env {
-
-	fmt.Println(v)
-}
-
-	
+//Конструктор  создания подключения к БД. 
+func New() (*DB, error) {	
 	connstr := os.Getenv("NEWSDB")
 	if connstr == "" {
+		logs.New().Error("переменная окружения \"NEWSDB\" не указана")
 		return nil, errors.New("не указано подключение к БД")
 	}
-	pool, err := pgxpool.Connect(context.Background(), connstr)
-	if err != nil {
+	//Выставим таймаут 
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	pool, err := pgxpool.Connect(ctx, connstr)
+	if err != nil {		
 		return nil, err
 	}
 	db := DB{
 		pool: pool,
 	}
+	time.Sleep(time.Second*time.Duration(11))
 	return &db, nil
 }
 
 func (db *DB)Close() {
-	if db.pool != nil {
+	if db.pool != nil {		
 		db.pool.Close()
+		logs.New().Debug("Закрыли подключение к БД")
 	}
-
 }
 
-
+// сохранение новостей в БД
 /* func (db *DB) StoreNews(news []rpc.ShortNew) error {
 	for _, post := range news {
 		_, err := db.pool.Exec(context.Background(), `

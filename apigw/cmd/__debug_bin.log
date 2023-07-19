@@ -1,2 +1,4 @@
 time="17-Jul-2023 10:13:48.71710" level=info msg="config loaded, start program...." app=__debug_bin
 time="17-Jul-2023 10:13:48.71710" level=info msg="Exit app..." app=__debug_bin
+time="19-Jul-2023 14:15:13.7192" level=info msg="config loaded, start program...." app=__debug_bin
+time="19-Jul-2023 14:15:54.7192" level=info msg="запуск потока загрузки новостей" app=__debug_bin

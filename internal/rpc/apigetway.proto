@@ -41,23 +41,23 @@ message Id{
     int64 Page =1;
 }
 
-message ArrayShortNews{
+/* message ArrayShortNews{
     repeated ShortNew Sl = 1;
-}
+} */
 
 message Result {
-     bool ret = 1;
-     string error =2;
+     int32 ret = 1;
+     repeated string error =2;
 }
 
 service RssService {
     // add news
     rpc  AddNew (ShortNew) returns (Result){}
-    rpc AddNews(stream ArrayShortNews )returns (Result) {}
+    rpc AddNews(stream  ShortNew )returns (Result) {}
     //list news
-    rpc List(Forlist) returns (stream ArrayShortNews) {}  // вернуть список новостей
+    rpc List(Forlist) returns (stream ShortNew) {}  // вернуть список новостей
 
     //вернуть  список новостей на странице 
-    rpc ListPage(Page) returns (stream ArrayShortNews) {}
+    rpc ListPage(Page) returns (stream ShortNew) {}
     
  }
