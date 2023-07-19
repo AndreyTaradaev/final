@@ -62,57 +62,6 @@ func FileExists(path string) bool {
     return !os.IsNotExist(err)
 }
 
-/* 
-	"github.com/joho/godotenv"
-	"sync"
-	
-)
-
-
-
-
-
-
-var once sync.Once
-var configGw configApi
-
-
-type Config  interface {
-Load(file string) 
-New()
-}
-
-
-
-// структура конфиг файла загрузка новостей
-/* type configApi struct {
-	URLS   []string `json:"rss"` // список ссылок на сервера 
-	Period int      `json:"request_period"` // врямя через какое  нужно обновлять новости
-	Port  int  `json:"port"`  // порт который прослушивает gateway
-}
-
-
-func New (file *string) *configApi{
-	once.Do(func() {
-		configGw = configApi{}  		
-	}) 
-return &configGw
-}
-
-func Load( ) error {
-
-	ex,err := os.Executable()
-	if(err!=nil){
-		return err
-	}
-	exPath := filepath.Dir(ex)
-
-
- 
-	
-	return nil
-}
- */
 
 
 

@@ -34,9 +34,9 @@ func main() {
 		return
 	}
 	//инициализация логирования
-	log := logs.New()
-	defer logs.Close()
+	log := logs.New()	
 	logs.InitConfig(conf.Log(), a.Debug)
+	defer logs.Close()
 	log.Info("config loaded, start program....")
 	log.Debugln("cmdline ", fmt.Sprintf("%#v", a))
 

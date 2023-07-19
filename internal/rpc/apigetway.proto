@@ -50,7 +50,7 @@ message Result {
      string error =2;
 }
 
-service NewsService {
+service RssService {
     // add news
     rpc  AddNew (ShortNew) returns (Result){}
     rpc AddNews(stream ArrayShortNews )returns (Result) {}

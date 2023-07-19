@@ -1,0 +1,2 @@
+time="19-Jul-2023 10:10:05.71910" level=info msg="запуск приложения" app=__debug_bin
+time="19-Jul-2023 10:10:05.71910" level=info msg="подключение к Базе Данных" app=__debug_bin

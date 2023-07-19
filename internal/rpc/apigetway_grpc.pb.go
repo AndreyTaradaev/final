@@ -21,66 +21,66 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	NewsService_AddNew_FullMethodName   = "/rpc_news.NewsService/AddNew"
-	NewsService_AddNews_FullMethodName  = "/rpc_news.NewsService/AddNews"
-	NewsService_List_FullMethodName     = "/rpc_news.NewsService/List"
-	NewsService_ListPage_FullMethodName = "/rpc_news.NewsService/ListPage"
+	RssService_AddNew_FullMethodName   = "/rpc_news.RssService/AddNew"
+	RssService_AddNews_FullMethodName  = "/rpc_news.RssService/AddNews"
+	RssService_List_FullMethodName     = "/rpc_news.RssService/List"
+	RssService_ListPage_FullMethodName = "/rpc_news.RssService/ListPage"
 )
 
-// NewsServiceClient is the client API for NewsService service.
+// RssServiceClient is the client API for RssService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type NewsServiceClient interface {
+type RssServiceClient interface {
 	// add news
 	AddNew(ctx context.Context, in *ShortNew, opts ...grpc.CallOption) (*Result, error)
-	AddNews(ctx context.Context, opts ...grpc.CallOption) (NewsService_AddNewsClient, error)
+	AddNews(ctx context.Context, opts ...grpc.CallOption) (RssService_AddNewsClient, error)
 	// list news
-	List(ctx context.Context, in *Forlist, opts ...grpc.CallOption) (NewsService_ListClient, error)
+	List(ctx context.Context, in *Forlist, opts ...grpc.CallOption) (RssService_ListClient, error)
 	// вернуть  список новостей на странице
-	ListPage(ctx context.Context, in *Page, opts ...grpc.CallOption) (NewsService_ListPageClient, error)
+	ListPage(ctx context.Context, in *Page, opts ...grpc.CallOption) (RssService_ListPageClient, error)
 }
 
-type newsServiceClient struct {
+type rssServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewNewsServiceClient(cc grpc.ClientConnInterface) NewsServiceClient {
-	return &newsServiceClient{cc}
+func NewRssServiceClient(cc grpc.ClientConnInterface) RssServiceClient {
+	return &rssServiceClient{cc}
 }
 
-func (c *newsServiceClient) AddNew(ctx context.Context, in *ShortNew, opts ...grpc.CallOption) (*Result, error) {
+func (c *rssServiceClient) AddNew(ctx context.Context, in *ShortNew, opts ...grpc.CallOption) (*Result, error) {
 	out := new(Result)
-	err := c.cc.Invoke(ctx, NewsService_AddNew_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, RssService_AddNew_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *newsServiceClient) AddNews(ctx context.Context, opts ...grpc.CallOption) (NewsService_AddNewsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &NewsService_ServiceDesc.Streams[0], NewsService_AddNews_FullMethodName, opts...)
+func (c *rssServiceClient) AddNews(ctx context.Context, opts ...grpc.CallOption) (RssService_AddNewsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &RssService_ServiceDesc.Streams[0], RssService_AddNews_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &newsServiceAddNewsClient{stream}
+	x := &rssServiceAddNewsClient{stream}
 	return x, nil
 }
 
-type NewsService_AddNewsClient interface {
+type RssService_AddNewsClient interface {
 	Send(*ArrayShortNews) error
 	CloseAndRecv() (*Result, error)
 	grpc.ClientStream
 }
 
-type newsServiceAddNewsClient struct {
+type rssServiceAddNewsClient struct {
 	grpc.ClientStream
 }
 
-func (x *newsServiceAddNewsClient) Send(m *ArrayShortNews) error {
+func (x *rssServiceAddNewsClient) Send(m *ArrayShortNews) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *newsServiceAddNewsClient) CloseAndRecv() (*Result, error) {
+func (x *rssServiceAddNewsClient) CloseAndRecv() (*Result, error) {
 	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
 	}
@@ -91,12 +91,12 @@ func (x *newsServiceAddNewsClient) CloseAndRecv() (*Result, error) {
 	return m, nil
 }
 
-func (c *newsServiceClient) List(ctx context.Context, in *Forlist, opts ...grpc.CallOption) (NewsService_ListClient, error) {
-	stream, err := c.cc.NewStream(ctx, &NewsService_ServiceDesc.Streams[1], NewsService_List_FullMethodName, opts...)
+func (c *rssServiceClient) List(ctx context.Context, in *Forlist, opts ...grpc.CallOption) (RssService_ListClient, error) {
+	stream, err := c.cc.NewStream(ctx, &RssService_ServiceDesc.Streams[1], RssService_List_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &newsServiceListClient{stream}
+	x := &rssServiceListClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -106,16 +106,16 @@ func (c *newsServiceClient) List(ctx context.Context, in *Forlist, opts ...grpc.
 	return x, nil
 }
 
-type NewsService_ListClient interface {
+type RssService_ListClient interface {
 	Recv() (*ArrayShortNews, error)
 	grpc.ClientStream
 }
 
-type newsServiceListClient struct {
+type rssServiceListClient struct {
 	grpc.ClientStream
 }
 
-func (x *newsServiceListClient) Recv() (*ArrayShortNews, error) {
+func (x *rssServiceListClient) Recv() (*ArrayShortNews, error) {
 	m := new(ArrayShortNews)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -123,12 +123,12 @@ func (x *newsServiceListClient) Recv() (*ArrayShortNews, error) {
 	return m, nil
 }
 
-func (c *newsServiceClient) ListPage(ctx context.Context, in *Page, opts ...grpc.CallOption) (NewsService_ListPageClient, error) {
-	stream, err := c.cc.NewStream(ctx, &NewsService_ServiceDesc.Streams[2], NewsService_ListPage_FullMethodName, opts...)
+func (c *rssServiceClient) ListPage(ctx context.Context, in *Page, opts ...grpc.CallOption) (RssService_ListPageClient, error) {
+	stream, err := c.cc.NewStream(ctx, &RssService_ServiceDesc.Streams[2], RssService_ListPage_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &newsServiceListPageClient{stream}
+	x := &rssServiceListPageClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -138,16 +138,16 @@ func (c *newsServiceClient) ListPage(ctx context.Context, in *Page, opts ...grpc
 	return x, nil
 }
 
-type NewsService_ListPageClient interface {
+type RssService_ListPageClient interface {
 	Recv() (*ArrayShortNews, error)
 	grpc.ClientStream
 }
 
-type newsServiceListPageClient struct {
+type rssServiceListPageClient struct {
 	grpc.ClientStream
 }
 
-func (x *newsServiceListPageClient) Recv() (*ArrayShortNews, error) {
+func (x *rssServiceListPageClient) Recv() (*ArrayShortNews, error) {
 	m := new(ArrayShortNews)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -155,86 +155,86 @@ func (x *newsServiceListPageClient) Recv() (*ArrayShortNews, error) {
 	return m, nil
 }
 
-// NewsServiceServer is the server API for NewsService service.
-// All implementations must embed UnimplementedNewsServiceServer
+// RssServiceServer is the server API for RssService service.
+// All implementations must embed UnimplementedRssServiceServer
 // for forward compatibility
-type NewsServiceServer interface {
+type RssServiceServer interface {
 	// add news
 	AddNew(context.Context, *ShortNew) (*Result, error)
-	AddNews(NewsService_AddNewsServer) error
+	AddNews(RssService_AddNewsServer) error
 	// list news
-	List(*Forlist, NewsService_ListServer) error
+	List(*Forlist, RssService_ListServer) error
 	// вернуть  список новостей на странице
-	ListPage(*Page, NewsService_ListPageServer) error
-	mustEmbedUnimplementedNewsServiceServer()
+	ListPage(*Page, RssService_ListPageServer) error
+	mustEmbedUnimplementedRssServiceServer()
 }
 
-// UnimplementedNewsServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedNewsServiceServer struct {
+// UnimplementedRssServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedRssServiceServer struct {
 }
 
-func (UnimplementedNewsServiceServer) AddNew(context.Context, *ShortNew) (*Result, error) {
+func (UnimplementedRssServiceServer) AddNew(context.Context, *ShortNew) (*Result, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddNew not implemented")
 }
-func (UnimplementedNewsServiceServer) AddNews(NewsService_AddNewsServer) error {
+func (UnimplementedRssServiceServer) AddNews(RssService_AddNewsServer) error {
 	return status.Errorf(codes.Unimplemented, "method AddNews not implemented")
 }
-func (UnimplementedNewsServiceServer) List(*Forlist, NewsService_ListServer) error {
+func (UnimplementedRssServiceServer) List(*Forlist, RssService_ListServer) error {
 	return status.Errorf(codes.Unimplemented, "method List not implemented")
 }
-func (UnimplementedNewsServiceServer) ListPage(*Page, NewsService_ListPageServer) error {
+func (UnimplementedRssServiceServer) ListPage(*Page, RssService_ListPageServer) error {
 	return status.Errorf(codes.Unimplemented, "method ListPage not implemented")
 }
-func (UnimplementedNewsServiceServer) mustEmbedUnimplementedNewsServiceServer() {}
+func (UnimplementedRssServiceServer) mustEmbedUnimplementedRssServiceServer() {}
 
-// UnsafeNewsServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to NewsServiceServer will
+// UnsafeRssServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to RssServiceServer will
 // result in compilation errors.
-type UnsafeNewsServiceServer interface {
-	mustEmbedUnimplementedNewsServiceServer()
+type UnsafeRssServiceServer interface {
+	mustEmbedUnimplementedRssServiceServer()
 }
 
-func RegisterNewsServiceServer(s grpc.ServiceRegistrar, srv NewsServiceServer) {
-	s.RegisterService(&NewsService_ServiceDesc, srv)
+func RegisterRssServiceServer(s grpc.ServiceRegistrar, srv RssServiceServer) {
+	s.RegisterService(&RssService_ServiceDesc, srv)
 }
 
-func _NewsService_AddNew_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _RssService_AddNew_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ShortNew)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(NewsServiceServer).AddNew(ctx, in)
+		return srv.(RssServiceServer).AddNew(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: NewsService_AddNew_FullMethodName,
+		FullMethod: RssService_AddNew_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NewsServiceServer).AddNew(ctx, req.(*ShortNew))
+		return srv.(RssServiceServer).AddNew(ctx, req.(*ShortNew))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _NewsService_AddNews_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(NewsServiceServer).AddNews(&newsServiceAddNewsServer{stream})
+func _RssService_AddNews_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(RssServiceServer).AddNews(&rssServiceAddNewsServer{stream})
 }
 
-type NewsService_AddNewsServer interface {
+type RssService_AddNewsServer interface {
 	SendAndClose(*Result) error
 	Recv() (*ArrayShortNews, error)
 	grpc.ServerStream
 }
 
-type newsServiceAddNewsServer struct {
+type rssServiceAddNewsServer struct {
 	grpc.ServerStream
 }
 
-func (x *newsServiceAddNewsServer) SendAndClose(m *Result) error {
+func (x *rssServiceAddNewsServer) SendAndClose(m *Result) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *newsServiceAddNewsServer) Recv() (*ArrayShortNews, error) {
+func (x *rssServiceAddNewsServer) Recv() (*ArrayShortNews, error) {
 	m := new(ArrayShortNews)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -242,74 +242,74 @@ func (x *newsServiceAddNewsServer) Recv() (*ArrayShortNews, error) {
 	return m, nil
 }
 
-func _NewsService_List_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _RssService_List_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(Forlist)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(NewsServiceServer).List(m, &newsServiceListServer{stream})
+	return srv.(RssServiceServer).List(m, &rssServiceListServer{stream})
 }
 
-type NewsService_ListServer interface {
+type RssService_ListServer interface {
 	Send(*ArrayShortNews) error
 	grpc.ServerStream
 }
 
-type newsServiceListServer struct {
+type rssServiceListServer struct {
 	grpc.ServerStream
 }
 
-func (x *newsServiceListServer) Send(m *ArrayShortNews) error {
+func (x *rssServiceListServer) Send(m *ArrayShortNews) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _NewsService_ListPage_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _RssService_ListPage_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(Page)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(NewsServiceServer).ListPage(m, &newsServiceListPageServer{stream})
+	return srv.(RssServiceServer).ListPage(m, &rssServiceListPageServer{stream})
 }
 
-type NewsService_ListPageServer interface {
+type RssService_ListPageServer interface {
 	Send(*ArrayShortNews) error
 	grpc.ServerStream
 }
 
-type newsServiceListPageServer struct {
+type rssServiceListPageServer struct {
 	grpc.ServerStream
 }
 
-func (x *newsServiceListPageServer) Send(m *ArrayShortNews) error {
+func (x *rssServiceListPageServer) Send(m *ArrayShortNews) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-// NewsService_ServiceDesc is the grpc.ServiceDesc for NewsService service.
+// RssService_ServiceDesc is the grpc.ServiceDesc for RssService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var NewsService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "rpc_news.NewsService",
-	HandlerType: (*NewsServiceServer)(nil),
+var RssService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "rpc_news.RssService",
+	HandlerType: (*RssServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "AddNew",
-			Handler:    _NewsService_AddNew_Handler,
+			Handler:    _RssService_AddNew_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "AddNews",
-			Handler:       _NewsService_AddNews_Handler,
+			Handler:       _RssService_AddNews_Handler,
 			ClientStreams: true,
 		},
 		{
 			StreamName:    "List",
-			Handler:       _NewsService_List_Handler,
+			Handler:       _RssService_List_Handler,
 			ServerStreams: true,
 		},
 		{
 			StreamName:    "ListPage",
-			Handler:       _NewsService_ListPage_Handler,
+			Handler:       _RssService_ListPage_Handler,
 			ServerStreams: true,
 		},
 	},

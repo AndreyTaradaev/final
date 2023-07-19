@@ -5,7 +5,8 @@ import (
 	"errors"
 	"os"
 	"github.com/jackc/pgx/v4/pgxpool"
-	rpc "gateway/internal/rpc"
+	//rpc "gateway/internal/rpc"
+	"fmt"
 )
 
 
@@ -15,7 +16,14 @@ type DB struct {
 }
 
 func New() (*DB, error) {
-	connstr := os.Getenv("newsdb")
+	env := os.Environ() 
+for _, v := range env {
+
+	fmt.Println(v)
+}
+
+	
+	connstr := os.Getenv("NEWSDB")
 	if connstr == "" {
 		return nil, errors.New("не указано подключение к БД")
 	}
@@ -29,7 +37,15 @@ func New() (*DB, error) {
 	return &db, nil
 }
 
-func (db *DB) StoreNews(news []rpc.ShortNew) error {
+func (db *DB)Close() {
+	if db.pool != nil {
+		db.pool.Close()
+	}
+
+}
+
+
+/* func (db *DB) StoreNews(news []rpc.ShortNew) error {
 	for _, post := range news {
 		_, err := db.pool.Exec(context.Background(), `
 		INSERT INTO news(title, content, pub_time, link)
@@ -78,4 +94,4 @@ func (db *DB) News(n int) ([]Post, error) {
 	}
 	return news, rows.Err()
 }
-
+ */

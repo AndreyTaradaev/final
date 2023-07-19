@@ -1,0 +1,33 @@
+time="19-Jul-2023 09:54:32.7199" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="19-Jul-2023 09:54:32.7199" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
+time="19-Jul-2023 09:54:32.7199" level=fatal msg="не указано подключение к БД" func="main.main()" file="newscmd.go:41" app=newscmd
+time="19-Jul-2023 09:59:03.7199" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="19-Jul-2023 09:59:03.7199" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
+time="19-Jul-2023 09:59:03.7199" level=fatal msg="не указано подключение к БД" func="main.main()" file="newscmd.go:41" app=newscmd
+time="19-Jul-2023 09:59:58.7199" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="19-Jul-2023 09:59:58.7199" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
+time="19-Jul-2023 09:59:58.7199" level=fatal msg="не указано подключение к БД" func="main.main()" file="newscmd.go:41" app=newscmd
+time="19-Jul-2023 10:01:56.71910" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="19-Jul-2023 10:01:56.71910" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
+time="19-Jul-2023 10:01:56.71910" level=fatal msg="не указано подключение к БД" func="main.main()" file="newscmd.go:41" app=newscmd
+time="19-Jul-2023 10:05:07.71910" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="19-Jul-2023 10:05:07.71910" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
+time="19-Jul-2023 10:05:07.71910" level=fatal msg="не указано подключение к БД" func="main.main()" file="newscmd.go:41" app=newscmd
+time="19-Jul-2023 10:07:44.71910" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="19-Jul-2023 10:07:44.71910" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
+time="19-Jul-2023 10:07:44.71910" level=fatal msg="не указано подключение к БД" func="main.main()" file="newscmd.go:41" app=newscmd
+time="19-Jul-2023 10:07:53.71910" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="19-Jul-2023 10:07:53.71910" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
+time="19-Jul-2023 10:07:53.71910" level=fatal msg="не указано подключение к БД" func="main.main()" file="newscmd.go:41" app=newscmd
+time="19-Jul-2023 10:08:01.71910" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="19-Jul-2023 10:08:01.71910" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
+time="19-Jul-2023 10:08:01.71910" level=fatal msg="не указано подключение к БД" func="main.main()" file="newscmd.go:41" app=newscmd
+time="19-Jul-2023 10:13:29.71910" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="19-Jul-2023 10:13:29.71910" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
+time="19-Jul-2023 10:13:29.71910" level=fatal msg="не указано подключение к БД" func="main.main()" file="newscmd.go:41" app=newscmd
+time="19-Jul-2023 10:14:10.71910" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="19-Jul-2023 10:14:10.71910" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
+time="19-Jul-2023 10:14:10.71910" level=fatal msg="не указано подключение к БД" func="main.main()" file="newscmd.go:41" app=newscmd
+time="19-Jul-2023 10:16:59.71910" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="19-Jul-2023 10:16:59.71910" level=info msg="подключение к Базе Данных" func="main.main()" file="newscmd.go:36" app=newscmd
+time="19-Jul-2023 10:16:59.71910" level=fatal msg="cannot parse `\"123123123\";  go run ./news/cmd/newscmd.go   --config  e:\\Go\\skilfactory\\module40\\final\\news\\cmd\\config.json --debug`: failed to parse as DSN (invalid dsn)" func="main.main()" file="newscmd.go:41" app=newscmd

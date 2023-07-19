@@ -2,7 +2,7 @@ package config
 
 // создание  singleton
 import (
-	"encoding/json"
+	"encoding/json"	
 	"gateway/internal/tools"
 	"io/ioutil"
 	"os"
@@ -45,7 +45,7 @@ func Help() string {
 		"logdir":       каталог куда пишем лог ,пустой пишем в stdout
 	 }
 	 необходима переменная среды окружения :
-	 NEWS_DB, формат  "postgres://<user>:<password>@<Host>:<Port>/<Database>
+	 "NEWSDB=", формат  "postgres://<user>:<password>@<Host>:<Port>/<Database>
 	 `
 	return h
 }
@@ -73,11 +73,11 @@ func (c *config) Load(file *string) error {
 	} else {
 		s = *file
 	}
-
 	b, err := ioutil.ReadFile(s)
+
 	if err != nil {
 		return err
-	}
+	}	
 	err = json.Unmarshal(b, &c.conf)
 	if err != nil {
 		return err
