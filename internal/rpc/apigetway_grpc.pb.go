@@ -21,7 +21,6 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	RssService_AddNew_FullMethodName   = "/rpc_news.RssService/AddNew"
 	RssService_AddNews_FullMethodName  = "/rpc_news.RssService/AddNews"
 	RssService_List_FullMethodName     = "/rpc_news.RssService/List"
 	RssService_ListPage_FullMethodName = "/rpc_news.RssService/ListPage"
@@ -32,7 +31,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RssServiceClient interface {
 	// add news
-	AddNew(ctx context.Context, in *ShortNew, opts ...grpc.CallOption) (*Result, error)
+	// rpc  AddNew (ShortNew) returns (Result){}
 	AddNews(ctx context.Context, opts ...grpc.CallOption) (RssService_AddNewsClient, error)
 	// list news
 	List(ctx context.Context, in *Forlist, opts ...grpc.CallOption) (RssService_ListClient, error)
@@ -46,15 +45,6 @@ type rssServiceClient struct {
 
 func NewRssServiceClient(cc grpc.ClientConnInterface) RssServiceClient {
 	return &rssServiceClient{cc}
-}
-
-func (c *rssServiceClient) AddNew(ctx context.Context, in *ShortNew, opts ...grpc.CallOption) (*Result, error) {
-	out := new(Result)
-	err := c.cc.Invoke(ctx, RssService_AddNew_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *rssServiceClient) AddNews(ctx context.Context, opts ...grpc.CallOption) (RssService_AddNewsClient, error) {
@@ -160,7 +150,7 @@ func (x *rssServiceListPageClient) Recv() (*ShortNew, error) {
 // for forward compatibility
 type RssServiceServer interface {
 	// add news
-	AddNew(context.Context, *ShortNew) (*Result, error)
+	// rpc  AddNew (ShortNew) returns (Result){}
 	AddNews(RssService_AddNewsServer) error
 	// list news
 	List(*Forlist, RssService_ListServer) error
@@ -173,9 +163,6 @@ type RssServiceServer interface {
 type UnimplementedRssServiceServer struct {
 }
 
-func (UnimplementedRssServiceServer) AddNew(context.Context, *ShortNew) (*Result, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddNew not implemented")
-}
 func (UnimplementedRssServiceServer) AddNews(RssService_AddNewsServer) error {
 	return status.Errorf(codes.Unimplemented, "method AddNews not implemented")
 }
@@ -196,24 +183,6 @@ type UnsafeRssServiceServer interface {
 
 func RegisterRssServiceServer(s grpc.ServiceRegistrar, srv RssServiceServer) {
 	s.RegisterService(&RssService_ServiceDesc, srv)
-}
-
-func _RssService_AddNew_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ShortNew)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RssServiceServer).AddNew(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: RssService_AddNew_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RssServiceServer).AddNew(ctx, req.(*ShortNew))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _RssService_AddNews_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -290,12 +259,7 @@ func (x *rssServiceListPageServer) Send(m *ShortNew) error {
 var RssService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "rpc_news.RssService",
 	HandlerType: (*RssServiceServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "AddNew",
-			Handler:    _RssService_AddNew_Handler,
-		},
-	},
+	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "AddNews",

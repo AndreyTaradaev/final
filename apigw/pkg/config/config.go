@@ -1,12 +1,14 @@
+// реализация файла конфигурации создает единственный экземпляр .
 package config
 
-// создание  singleton
 import (
 	"encoding/json"
 	"gateway/internal/tools"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -18,6 +20,7 @@ type config struct {
 	conf config_imp
 }
 
+// пряиой доступ к членам запрещен
 type config_imp struct {
 	Urls        []string `json:"rss"`                   // список ссылок на сервера  по умолчанию пустой
 	Period      int      `json:"request_period"`        // врямя через какое  нужно обновлять новости  по умолчанию 300 сек.
@@ -40,11 +43,16 @@ func Help() string {
 	 и комментариев 
 	 использование  
 	 ` + tools.GetBase(ex) + ` [-help]  [-config  <path>] [-debug]
+	 	загрузка настроек по умолчанию происходит из файла конфигурации   config.json 
+		в параметрах командной строки  можно загрузку  альтернативной  конфигурации
+		также поддерживается загрузка параметров конфигурации из переменных среды окружения:
+		URLS, PERIOD,PORT, NEWSHOST,NEWSPORT,COMMENTHOST,COMMENTPORT,LOGDIR
+		переменные окружения имеют приоритет перед файлом
 	 параметры командной строки: 
 	 -help  (-h) --данная справка 
-	 -config  --путь до конфиг файл с которого надо загружаться если параметр не указан то ищет config.json 
-	 			ищет его втом же каталоге где и расположен исполняемый файл
+	 -config  --   путь до  файла конфигурации				
 	 -debug  --включить отладку
+
 	формат конфиг файла --  JSON.
 	структура файла:
 	{
@@ -72,34 +80,94 @@ func Help() string {
 // ctor for config-object
 func New() *config {
 	once.Do(func() {
-		apiconfig = config{}
+		apiconfig = config{
+			conf: config_imp{Urls: []string{},
+				Period:      300,
+				Port:        8080,
+				NewsHost:    "localhost",
+				NewsPort:    12345,
+				CommentHost: "localhost",
+				CommentPort: 12346,
+				Logdir:      "", // в stdout
+			},
+		}
 	})
 	return &apiconfig
 }
 
-// загрузка конфигурации
-func (c *config) Load(file *string) error {
+// загрузка переменных в среду оуружения
+func (c *config) loadFromEnv() {
+	variable := os.Getenv("URLS")
+	if len(variable) != 0 {
+		splitFunc := func(r rune) bool {
+			return strings.ContainsRune(" ;,", r)
+		}
+		c.conf.Urls = strings.FieldsFunc(variable, splitFunc)
+	}
+	variable = os.Getenv("PERIOD")
+	if len(variable) != 0 {
+		p, err := strconv.Atoi(variable)
+		if err == nil {
+			c.conf.Period = p
+		}
+	}
+	variable = os.Getenv("PORT")
+	if len(variable) != 0 {
+		p, err := strconv.Atoi(variable)
+		if err == nil {
+			c.conf.Port = p
+		}
+	}
+
+	variable = os.Getenv("NEWSHOST")
+	if len(variable) != 0 {
+		c.conf.NewsHost = variable
+	}
+	variable = os.Getenv("NEWSPORT")
+	if len(variable) != 0 {
+		p, err := strconv.Atoi(variable)
+		if err == nil {
+			c.conf.NewsPort = p
+		}
+	}
+
+	variable = os.Getenv("COMMENTHOST")
+	if len(variable) != 0 {
+		c.conf.CommentHost = variable
+	}
+	variable = os.Getenv("COMMENTPORT")
+	if len(variable) != 0 {
+		p, err := strconv.Atoi(variable)
+		if err == nil {
+			c.conf.CommentPort = p
+		}
+	}
+
+	variable = os.Getenv("Logdir")
+	if len(variable) != 0 {
+		c.conf.CommentHost = variable
+	}
+}
+
+// загрузка конфигурации из файла или из Переменных окружения
+func (c *config) Load(file string) error {
 	//если	 file пустой ищем  конфиг  в  директории исполняемого файла
 	var s string
-	if file == nil {
+	if len(file) == 0 {
 		exe, err := os.Executable()
 		if err != nil {
 			return err
 		}
 		s = filepath.Dir(exe) + "/" + filename
-	} else {
-		s = *file
 	}
 
 	b, err := ioutil.ReadFile(s)
-	if err != nil {
-		return err
+	if err == nil {
+		json.Unmarshal(b, &c.conf)
 	}
-	err = json.Unmarshal(b, &c.conf)
-	if err != nil {
-		return err
-	}
-
+	// from env
+	c.loadFromEnv()
+	// проверка на корректность
 	if c.conf.Port == 0 {
 		c.conf.Port = 8080
 	}

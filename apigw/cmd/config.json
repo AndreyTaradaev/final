@@ -8,6 +8,6 @@
    "request_period": 2,   	
 	  "newsport" : 10000,    
 	"commentport": 10001,
-	"logdir": "e:\\Go\\skilfactory\\module40\\final\\apigw\\cmd"
+	"logdir": "e:/Go/skilfactory/module40/final/apigw/cmd"
 	
 }

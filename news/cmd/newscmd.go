@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	logs "gateway/internal/log"
-	"gateway/internal/tools"
-	"gateway/news/pkg/config"
-	"gateway/news/pkg/storage"
+	"gateway/internal/tools"	
+	"gateway/news/pkg/config"	
+	"gateway/news/pkg/service"
+	"net"
+	
 )
 
 func main() {
@@ -33,13 +35,16 @@ func main() {
 	logs.InitConfig(conf.Log(), a.Debug)
 	defer logs.Close()
 	log.Info("запуск приложения")
-	log.Info("подключение к Базе Данных")
-	// инициализация подключения к БД
-	db, err := storage.New()
-	if err != nil {
-		fmt.Println(err)
-		log.Fatal(err)
-	}
-	defer db.Close()
+	log.Infoln("командная строка ", a )
 
+	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", conf.Port()))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	//подключение БД и страт сервера RPC
+	err = service.RunServer(&lis) 
+	if(err!=nil){
+		log.Fatalf("failed to listen: %v", err)
+	}
+	
 }

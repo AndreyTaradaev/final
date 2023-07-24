@@ -34,8 +34,8 @@ message Forlist {
 }
 
 message Page{
-    int32 Page =1;
-    int32 offset =2;
+    int32 Page  =1;
+    int32 Limit =2;
 }
 message Id{
     int64 Page =1;
@@ -52,7 +52,7 @@ message Result {
 
 service RssService {
     // add news
-    rpc  AddNew (ShortNew) returns (Result){}
+   // rpc  AddNew (ShortNew) returns (Result){}
     rpc AddNews(stream  ShortNew )returns (Result) {}
     //list news
     rpc List(Forlist) returns (stream ShortNew) {}  // вернуть список новостей

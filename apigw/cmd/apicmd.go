@@ -38,23 +38,28 @@ func main() {
 	logs.InitConfig(conf.Log(), a.Debug)
 	defer logs.Close()
 	log.Info("config loaded, start program....")
-	log.Debugln("cmdline ", fmt.Sprintf("%#v", a))
+	log.Infoln("cmdline ", fmt.Sprintf("%#v", a))
 
 	log.Debugln("loaded config ", fmt.Sprintf("%#v", conf))
 	// запускаем загрузку новостей
+	newstarget := fmt.Sprintf("%s:%d",conf.Newshost(),conf.Newsport())
+	comenttarget := fmt.Sprintf("%s:%d",conf.СommentHost(),conf.СommentPort())
 
-	go rss.LoadNews(conf.Urls() , conf.Period())
-
-	api,err := api.New() 
+	log.Info ("Start thread dowload rss")
+	go rss.LoadNews(conf.Urls() , conf.Period(),newstarget)
+	// инициализация маршрутизатора HTTP и  RPc соединения
+	log.Info ("Init Http router")
+	api,err := api.New(newstarget ,comenttarget) 
 	if(err != nil){
 		log.Fatal(err)
 	}
 
 	Port := fmt.Sprintf(":%d",conf.Port())
+	log.Info ("Init Http server")
 	err  =http.ListenAndServe(Port, api.Router())
     if err != nil {
        log.Fatal(err)
     }	
 	
-	log.Info("Exit app...")
+	//log.Info("Exit app...")
 }
