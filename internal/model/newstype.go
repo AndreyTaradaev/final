@@ -12,6 +12,9 @@ import (
 	"hash/crc64"
 )
 
+// количество новостей на странице
+const Limit int = 20
+
 //структура сокращенной новости
 
 type Short struct {
@@ -36,6 +39,41 @@ func NewShort(id int64, title, desc string, time int64, url, Uid string) *Short 
 	return &ret
 }
 
+func CreateShort(id *int64, title, desc *string, time *int64, url *string, hash *int64) *Short {
+	sh := Short{}
+	if id != nil {
+		sh.ID = *id
+	} else {
+		sh.ID = 0
+	}
+	if title != nil {
+		sh.Title = *title
+	} else {
+		sh.Title = ""
+	}
+	if desc != nil {
+		sh.Description = *desc
+	} else {
+		sh.Description = ""
+	}
+	if time != nil {
+		sh.Time = *time
+	} else {
+		sh.Time = 0
+	}
+	if url != nil {
+		sh.Url = *url
+	} else {
+		sh.Url = ""
+	}
+	if hash != nil {
+		sh.Hash = *hash
+	} else {
+		sh.Hash = 0
+	}
+	return &sh
+}
+
 // Конвертирует данные из модели RPC в модель приложения
 func (s *Short) Convert(i *pb.ShortNew) {
 	s.ID = i.GetID()
@@ -54,6 +92,12 @@ type ShortNews struct {
 // добавление элементов в массив.
 func (s *ShortNews) Add(sh ...Short) {
 	s.news = append(s.news, sh...)
+}
+
+// добавление из данных
+func (s *ShortNews) AddFromData(id *int64, title, desc *string, time *int64, url *string, hash *int64) {
+	sh := CreateShort(id, title, desc, time, url, hash)
+	s.news = append(s.news, *sh)
 }
 
 // Добавление новости из  модели RPC.

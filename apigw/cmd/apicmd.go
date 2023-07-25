@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
+	"gateway/apigw/pkg/api"
 	"gateway/apigw/pkg/config"
 	"gateway/apigw/pkg/rss"
 	logs "gateway/internal/log"
 	tools "gateway/internal/tools"
-	"gateway/apigw/pkg/api"
 	"net/http"
+	//"gateway/apigw/pkg/api"
+	//"net/http"
 	//"log"
 )
 
@@ -25,41 +27,40 @@ func main() {
 		fmt.Println(config.Help())
 		return
 	}
-
 	// загрузка конфига
 	conf := config.New()
-	err = conf.Load(&a.Fileconfig)
+	err = conf.Load(a.Fileconfig)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+
 	//инициализация логирования
-	log := logs.New()	
+	log := logs.New()
 	logs.InitConfig(conf.Log(), a.Debug)
 	defer logs.Close()
 	log.Info("config loaded, start program....")
-	log.Infoln("cmdline ", fmt.Sprintf("%#v", a))
+	log.Infoln("cmdline: ", a)
 
-	log.Debugln("loaded config ", fmt.Sprintf("%#v", conf))
+	log.Debugln("loaded config ", conf)
 	// запускаем загрузку новостей
-	newstarget := fmt.Sprintf("%s:%d",conf.Newshost(),conf.Newsport())
-	comenttarget := fmt.Sprintf("%s:%d",conf.СommentHost(),conf.СommentPort())
+	newstarget := fmt.Sprintf("%s:%d", conf.Newshost(), conf.Newsport())
+	go rss.LoadNews(newstarget, conf.Urls(), conf.Period())
 
-	log.Info ("Start thread dowload rss")
-	go rss.LoadNews(conf.Urls() , conf.Period(),newstarget)
+	comenttarget := fmt.Sprintf("%s:%d", conf.СommentHost(), conf.СommentPort())
+
+	log.Info("Start thread dowload rss")
 	// инициализация маршрутизатора HTTP и  RPc соединения
-	log.Info ("Init Http router")
-	api,err := api.New(newstarget ,comenttarget) 
-	if(err != nil){
+	log.Info("Init Http router")
+	api, err := api.New(newstarget, comenttarget)
+	if err != nil {
 		log.Fatal(err)
 	}
 
-	Port := fmt.Sprintf(":%d",conf.Port())
-	log.Info ("Init Http server")
-	err  =http.ListenAndServe(Port, api.Router())
-    if err != nil {
-       log.Fatal(err)
-    }	
-	
-	//log.Info("Exit app...")
+	Port := fmt.Sprintf(":%d", conf.Port())
+	log.Info("Init Http server")
+	err = http.ListenAndServe(Port, api.Router())
+	if err != nil {
+		log.Fatal(err)
+	}
 }

@@ -4,12 +4,11 @@ package rpcclient
 import (
 	"context"
 	"fmt"
-
-	//"gateway/apigw/pkg/config"
 	logs "gateway/internal/log"
-	pb "gateway/internal/rpc"
 	"gateway/internal/model"
-	"io"
+	pb "gateway/internal/rpc"
+
+	//"io"
 	"time"
 
 	"google.golang.org/grpc"
@@ -18,29 +17,43 @@ import (
 	"google.golang.org/grpc/keepalive"
 )
 
- var kacp = keepalive.ClientParameters{
-    Time:                10 * time.Second, // send pings every 10 seconds if there is no activity
-    Timeout:             time.Second,      // wait 1 second for ping back
-    PermitWithoutStream: true,             // send pings even without active streams
-} 
-
-type RPClient struct {
-	client *grpc.ClientConn
+var kacp = keepalive.ClientParameters{
+	Time:                240 * time.Second, // send pings every 240 seconds if there is no activity
+	Timeout:             3 * time.Second,   // wait 1 second for ping back
+	PermitWithoutStream: true,              // send pings even without active streams
 }
 
-const timeout int = 120
-
+type RPClient struct {
+	client  *grpc.ClientConn
+	timeout int
+}
 
 // конструктор для соединения по RPC
 // создает соединение с микросервисем
-func  Connect  (target string) (*RPClient, error) {
-	
+func Connect(target string, time_out int) (*RPClient, error) {
+
 	if len(target) == 0 {
 		return nil, fmt.Errorf("server RPC is emply")
 	}
-	ret := RPClient{}	
-	logs.New().Debug(" RPC connect  server: ",target )
-	client, err := grpc.Dial(target, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock(),grpc.WithKeepaliveParams(kacp))
+	ret := RPClient{timeout: time_out}
+	logs.New().Debug(" RPC connect  server: ", target)
+	client, err := grpc.Dial(target, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock(), grpc.WithKeepaliveParams(kacp))
+	if err != nil {
+		return nil, err
+	}
+	ret.client = client
+	return &ret, nil
+}
+
+// // создает соединение с микросервисем c контекстом  по таймауту для загрузки RSS новостей
+func ConnectWithContext(target string, time_out int) (*RPClient, error) {
+
+	if len(target) == 0 {
+		return nil, fmt.Errorf("server RPC is emply")
+	}
+	ret := RPClient{timeout: time_out}
+	ctx, _ := context.WithTimeout(context.Background(), time.Second*time.Duration(ret.timeout))
+	client, err := grpc.DialContext(ctx, target, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +68,6 @@ func (d *RPClient) Client() *grpc.ClientConn {
 
 // закрытие соединения
 func (d *RPClient) Close() error {
-	logs.New().Debug("RPC client:", d.client.Target(), " close")
 	return d.client.Close()
 }
 
@@ -64,85 +76,95 @@ func (d *RPClient) GetState() connectivity.State {
 	return d.client.GetState()
 }
 
-//  Загрузка RSS   
-func (d *RPClient) RunRssServiceAddNews(s model.ShortNews) error {
+// Загрузка RSS
+func (d *RPClient) RunRssServiceAddNews(s *model.ShortNews) error {
 	client := pb.NewRssServiceClient(d.client)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.timeout)*time.Second)
 	defer cancel()
 	stream, err := client.AddNews(ctx)
 	if err != nil {
+		logs.New().Error(err)
 		return err
 	}
 	for _, v := range s.Get() {
 		sh := pb.ShortNew{ID: v.ID, Title: v.Title, Description: v.Description, Time: v.Time, Hash: int64(v.Hash), Url: v.Url}
 		if err := stream.Send(&sh); err != nil {
-			logs.New().Debug(err)
+			logs.New().Error(err)
 			return err
 		}
 	}
-	_, err = stream.CloseAndRecv()
+	reply, err := stream.CloseAndRecv()
 	if err != nil {
+		logs.New().Error(err)
 		return err
 	}
+	logs.New().Debug("server return result, count error: ", len(reply.GetError()), " processed ", reply.GetRet())
 	return nil
 }
 
-/* func (d *RPClient) RunRssServiceList() (model.ShortNews, error) {
+// получение списка новостей по RPC
+// вернуть  список новостей на странице
+func (d *RPClient) RunRssServiceListPage(Page, limit uint32) (*model.ShortNews, error) {
 	var sn model.ShortNews
 	client := pb.NewRssServiceClient(d.client)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.timeout)*time.Second)
 	defer cancel()
-	stream, err := client.List(ctx, &pb.Forlist{})
+	pbPage := pb.Page{Limit: limit, Page: Page}
+	array, err := client.ListPage(ctx, &pbPage)
 	if err != nil {
-		return sn, err
+		return nil, err
 	}
-	var rss model.Short
-	for {
-
-		serverNews, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return sn, err
-		}
-		rss.Convert(serverNews)
-		sn.Add(rss)
+	for _, v := range array.GetSl() {
+		sn.Append(v)
 	}
-	return sn, nil
+	return &sn, nil
 }
-//ошибка Page Это лимит
-func (d *RPClient) RunRssServicePage(Page,limit int32) (model.ShortNews, error) {
+
+// вернуть список последних новостей  для веб-интефейса
+func (d *RPClient) RunRssServiceList(n uint64) (*model.ShortNews, error) {
 	var sn model.ShortNews
 	client := pb.NewRssServiceClient(d.client)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.timeout)*time.Second)
 	defer cancel()
-	pbPage :=  pb.Page{Limit : limit,Page: Page}
-	stream, err := client.ListPage(ctx,&pbPage)	
+	l := pb.Forlist{Count: n}
+	array, err := client.List(ctx, &l)
 	if err != nil {
-		return sn, err
+		return nil, err
 	}
-	var rss model.Short
-	for {
-
-		serverNews, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return sn, err
-		}
-		rss.Convert(serverNews)
-		sn.Add(rss)
+	for _, v := range array.GetSl() {
+		sn.Append(v)
 	}
-	return sn, nil
+	return &sn, nil
 }
- */
 
-/*func (d *Dial) AddNew (ShortNew model.Short )  {
-
-
+// детальная новость
+func (d *RPClient) RunRssServiceGetNews(n uint64) (*model.Short, error) {
+	var sn model.Short
+	client := pb.NewRssServiceClient(d.client)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.timeout)*time.Second)
+	defer cancel()
+	l := pb.Forlist{Count: n}
+	news, err := client.GetNews(ctx, &l)
+	if err != nil {
+		return nil, err
+	}
+	sn.Convert(news)
+	return &sn, nil
 }
-*/
 
-// c := pb.NewBaseServiceClient(conn)
+// поиск по фильтру
+func (d *RPClient) RunRssServiceSearch(f *model.Filter) (*model.ShortNews, error) {
+	var sn model.ShortNews
+	client := pb.NewRssServiceClient(d.client)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.timeout)*time.Second)
+	defer cancel()
+	fb := f.ToPB()
+	array, err := client.Search(ctx, fb)
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range array.GetSl() {
+		sn.Append(v)
+	}
+	return &sn, nil
+}

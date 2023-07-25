@@ -3,6 +3,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"gateway/internal/tools"
 	"io/ioutil"
 	"os"
@@ -32,45 +33,41 @@ type config_imp struct {
 	Logdir      string   `json:"logdir,omitempty"`      //  каталог куда пишем лог ,пустой пишем в stdout
 }
 
-// имя файла конфига
-const filename string = "config.json"
-
 // справка по программе.
 func Help() string {
 	ex, _ := os.Executable()
 	var h string
 	h = `программма ` + tools.GetBase(ex) + ` является  маршрутизатором между клиентом и и микросервисами новостей
-	 и комментариев 
-	 использование  
-	 ` + tools.GetBase(ex) + ` [-help]  [-config  <path>] [-debug]
-	 	загрузка настроек по умолчанию происходит из файла конфигурации   config.json 
-		в параметрах командной строки  можно загрузку  альтернативной  конфигурации
-		также поддерживается загрузка параметров конфигурации из переменных среды окружения:
-		URLS, PERIOD,PORT, NEWSHOST,NEWSPORT,COMMENTHOST,COMMENTPORT,LOGDIR
-		переменные окружения имеют приоритет перед файлом
-	 параметры командной строки: 
-	 -help  (-h) --данная справка 
-	 -config  --   путь до  файла конфигурации				
-	 -debug  --включить отладку
-
-	формат конфиг файла --  JSON.
-	структура файла:
-	{
-		"rss":[
-			<список  серверов новостей>
-		],
-		"period": период обновления (число)
-		"port" :  порт  прослушиваения (число ,необязательный ) по умолчанию 8080
-		"newshost":   адрес   микросервиса новостей  (строка ,необязательный ) 
-				по умолчанию localhost
-		"newsport":   port  на котором слушает микросервис новостей (число ,необязательный )
-			  по умолчанию 12345
-	    "commenthost":   адрес  на котором слушает микросервис коментариев  (строка ,необязательный )
-			  по умолчанию localhost
-	     "commentport": port  на котором слушает микросервис комментариев(число ,необязательный )
-		 	  по умолчанию 12346	
-	 }
-
+и комментариев. 
+использование: 
+` + tools.GetBase(ex) + ` [-help]  [-config  <path>] [-debug]
+параметры командной строки: 
+	-help  (-h) --данная справка 
+	-config  --   путь до  файла конфигурации				
+	-debug  --включить отладку
+формат конфиг файла: JSON.
+структура файла:
+{
+"rss":[
+  		<список  серверов новостей> по умолчанию пустой
+	  ],
+"period":         период обновления (число секунд между обновлениями) по умолчанию 300
+"port":           порт  прослушиваения (число ,необязательный ) по умолчанию 8080
+"newshost":       адрес   микросервиса новостей  (строка ,необязательный ) 
+				  по умолчанию "localhost"
+"newsport":       port  на котором слушает микросервис новостей (число ,необязательный )
+	  			  по умолчанию 12345
+"commenthost":    адрес  на котором слушает микросервис коментариев  (строка ,необязательный )
+	  			  по умолчанию "localhost"
+"commentport":   port  на котором слушает микросервис комментариев(число ,необязательный )
+ 	 			  по умолчанию 12346
+"Logdir":        каталог сохранения журнала работы приложения    	  	
+}
+загрузка настроек по умолчанию происходит из файла конфигурации   config.json 
+в параметрах командной строки  можно загрузку  альтернативной  конфигурации
+также поддерживается загрузка параметров конфигурации из переменных среды окружения:
+URLS, PERIOD,PORT, NEWSHOST,NEWSPORT,COMMENTHOST,COMMENTPORT,LOGDIR
+переменные окружения имеют приоритет перед файлом
 	 `
 	return h
 }
@@ -152,16 +149,15 @@ func (c *config) loadFromEnv() {
 // загрузка конфигурации из файла или из Переменных окружения
 func (c *config) Load(file string) error {
 	//если	 file пустой ищем  конфиг  в  директории исполняемого файла
-	var s string
 	if len(file) == 0 {
 		exe, err := os.Executable()
 		if err != nil {
 			return err
 		}
-		s = filepath.Dir(exe) + "/" + filename
+		file = filepath.Dir(exe) + "/" + tools.FileConfig()
 	}
 
-	b, err := ioutil.ReadFile(s)
+	b, err := ioutil.ReadFile(file)
 	if err == nil {
 		json.Unmarshal(b, &c.conf)
 	}
@@ -184,6 +180,16 @@ func (c *config) Load(file string) error {
 		c.conf.CommentPort = 12346
 	}
 	return nil
+}
+
+func (c *config) String() string {
+	var ret string = "Urls: "
+	for _, v := range c.conf.Urls {
+		ret += "\n\t" + v
+	}
+	ret += fmt.Sprintf("\nPeriod: %d\nPort: %d,\nNewsHost: %s\n NewsPort: %d\nCommentHost: %s\nCommmentPort: %d\nLogDir: %s",
+		c.conf.Period, c.conf.Port, c.conf.NewsHost, c.conf.NewsPort, c.conf.CommentHost, c.conf.CommentPort, c.conf.Logdir)
+	return ret
 }
 
 // геттер списка серверов .

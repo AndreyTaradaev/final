@@ -5,7 +5,7 @@
       "https://cprss.s3.amazonaws.com/golangweekly.com.xml",
 	  "https://lenta.ru/rss"
    ],
-   "request_period": 2,   	
+   "request_period": 180,   	
 	  "newsport" : 10000,    
 	"commentport": 10001,
 	"logdir": "e:/Go/skilfactory/module40/final/apigw/cmd"

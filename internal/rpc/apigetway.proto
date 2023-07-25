@@ -30,34 +30,72 @@ message ShortNew {
 }
 
 message Forlist {
-   //int32 count = 1 ; 
+   uint64 count = 1 ; 
 }
 
 message Page{
-    int32 Page  =1;
-    int32 Limit =2;
+    uint32 Page  =1;
+    uint32 Limit =2;
 }
 message Id{
     int64 Page =1;
 }
 
-/* message ArrayShortNews{
+ message ArrayShortNews{
     repeated ShortNew Sl = 1;
-} */
+} 
 
 message Result {
      int32 ret = 1;
      repeated string error =2;
 }
+// Вспомогательные структуры
+enum OrderSORT {
+    SORT_DESC = 0;
+    SORT_ASC = 1;    
+  }
+enum FIELD_SORT{
+    FIELD_ID =0;
+    FIELD_TITLE =1;
+    FIELD_DESC = 2;
+    FIELD_DATE = 3;
+    FIELD_URL = 4;
+}
+
+enum OptionSearch {    
+    WholeWord = 0;
+    WordPart = 1;    
+    WordExclude =2;
+    WordPartExclude = 3;
+}
+
+message optionSort{
+    FIELD_SORT Field = 1;
+    OrderSORT  Sort =2;
+}
+
+message FindWord{
+    string Search =1;
+    OptionSearch Option = 2;
+}
+
+message FilterDate{
+    int64 StartDate =1;
+    int64 EndDate =2;
+}
+
+message Filter {
+    FindWord Word =1;
+    optionSort Sort =2;
+    FilterDate Period =3;
+}
 
 service RssService {
-    // add news
-   // rpc  AddNew (ShortNew) returns (Result){}
+    // add news  
     rpc AddNews(stream  ShortNew )returns (Result) {}
     //list news
-    rpc List(Forlist) returns (stream ShortNew) {}  // вернуть список новостей
-
-    //вернуть  список новостей на странице 
-    rpc ListPage(Page) returns (stream ShortNew) {}
-    
+    rpc List(Forlist) returns (ArrayShortNews) {}       //вернуть список последних новостей  для веб-интефейса
+    rpc ListPage(Page) returns (ArrayShortNews) {}      //вернуть  список новостей на странице 
+    rpc GetNews (Forlist) returns (ShortNew) {}         //детальная новость 
+    rpc Search  (Filter) returns (ArrayShortNews) {}    //поиск по фильтру  
  }

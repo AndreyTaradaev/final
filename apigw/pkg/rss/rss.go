@@ -1,17 +1,16 @@
 package rss
 
 import (
-	"gateway/internal/model"
-	"gateway/apigw/pkg/service"
+	"gateway/apigw/pkg/rpcclient"
 	logs "gateway/internal/log"
+	"gateway/internal/model"
 	"time"
-
 	"github.com/SlyMarbo/rss"
-	tags "github.com/grokify/html-strip-tags-go"
+	tags "github.com/grokify/html-strip-tags-go"	
 )
 
 // создает  цикл периодически загружает новости из массива urls в отдельных потоках.
-func LoadNews(urls []string, min int,rpctarget string  ) {
+func LoadNews(rpctarget string, urls []string, sec int) {
 	logger := logs.New()
 	logger.Info("запуск потока загрузки новостей")
 	if len(urls) == 0 {
@@ -19,43 +18,61 @@ func LoadNews(urls []string, min int,rpctarget string  ) {
 		return
 	}
 
+	f := func(url, target string) {
+		nw, err := loadrss(url)
+		if err != nil {
+			logger.Error("urls: " + url + ", " + err.Error())
+			return
+		}
+		if nw.Len() == 0 {
+			logger.Debug("not found load news")
+			return
+		}
+		logger.Debugf("urls: %s , loaded %d news", url , nw.Len())
+		err = writeNews(rpctarget, nw)
+		if err != nil {
+			logger.Error("Load news on server  " + rpctarget + ", " + err.Error())
+		}
+	}
+
 	for {
 		select {
-		case <-time.After(time.Minute * time.Duration(min)): // time.After вызывается 1 раз поэтому в цикле
+		case <-time.After(time.Second * time.Duration(sec)): // time.After вызывается 1 раз поэтому в цикле
 			for _, v := range urls {
-				go loadrss(v,rpctarget)
+				go f(v, rpctarget)
 			}
 		}
 	}
 
 }
 
-// загрузка новостей с сервера  и передача по RPC
-func loadrss(u string , rpctarget string) {
-	logger := logs.New()
-	logger.Debug("Загрузка новостей по адресу: " + u)
+// отправка новостей на сервис, передача по RPC
+func writeNews(target string, news *model.ShortNews) error {
+	//создаем  клиента RPC
+ 	D, err := rpcclient.ConnectWithContext(target,150)
+	if(err!=nil){
+		return err
+	}	
+	defer D.Close()
+	//отправляем массив новостей на сервер
+	err = D.RunRssServiceAddNews(news)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// загрузка новостей с сервера  
+func loadrss(u string) (*model.ShortNews, error) {
 	feed, err := rss.Fetch(u)
 	if err != nil {
-		logger.Error("urls: " + u + ", " + err.Error())
-		return
+		return nil, err
 	}
 	var news model.ShortNews
 
 	for _, v := range feed.Items {
 		n := model.NewShort(0, v.Title, tags.StripTags(v.Summary), v.Date.Unix(), v.Link, v.ID)
 		news.Add(*n)
-	}
-	logger.Debugf("urls: %s , loaded %d news", u, news.Len())
-	//создаем  клиента RPC
-	D, err := service.Init(rpctarget)
-	if err != nil {
-		logger.Error(err)
-		return
-	}
-	defer D.Close()
-	//отправляем массив новостей на сервер
-	err = D.RunRssServiceAddNews(news)
-	if err != nil {
-		logger.Error(err)
-	}
+	}	
+	return &news, nil
 }

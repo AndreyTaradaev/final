@@ -12,18 +12,27 @@ import (
 	"google.golang.org/grpc"
 )
 
+type RssServiceServer struct {
+	pb.UnimplementedRssServiceServer
+	db *storage.DB
+}
+
+// запуск микросервиса новостей
 func RunServer(lis *net.Listener) error {
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
 	NS, err := newServer()
 	if err != nil {
+		grpcServer.Stop()
 		return err
 	}
 	pb.RegisterRssServiceServer(grpcServer, NS)
+	logs.New().Debug(grpcServer.GetServiceInfo())
 	grpcServer.Serve(*lis)
 	return nil
 }
 
+// конструктор RPC сервера
 func newServer() (*RssServiceServer, error) {
 	db, err := storage.New()
 	if err != nil {
@@ -33,71 +42,44 @@ func newServer() (*RssServiceServer, error) {
 	return &ret, nil
 }
 
-type RssServiceServer struct {
-	pb.UnimplementedRssServiceServer
-	db *storage.DB
-}
-
-func (s *RssServiceServer) AddNew(ctx context.Context, sn *pb.ShortNew) (*pb.Result, error) {
-
-	return &pb.Result{Ret: 1}, nil
-}
-
+// добавить новости
 func (s *RssServiceServer) AddNews(stream pb.RssService_AddNewsServer) error {
-
-	var sh model.ShortNews
+	var StrErr []string
+	var i int32 = 0
+	var m model.Short
 	logs.New().Debug("client send  data")
 	for {
 		S, err := stream.Recv()
-		var m model.Short
 		if err == io.EOF {
-			// дошли до конца  запись в БД
-			logs.New().Debug("client end send data count", sh.Len())
-			logs.New().Info("Write news to database")
-			go s.db.AddNews(sh.Get())
-			return stream.SendAndClose(&pb.Result{Ret: int32(sh.Len()), Error: []string{}})
+			// дошли до конца  отправляем клиенту результат
+			logs.New().Debug("client's data has been processed")
+			return stream.SendAndClose(&pb.Result{Ret: i, Error: StrErr})
 		}
-		if err != nil {
-			return err
-		}
-		m.Convert(S)
-		sh.Add(m)
-	}	
-}
-
-//handler rpc  list news
-func (s *RssServiceServer) List(l *pb.Forlist, stream pb.RssService_ListServer) error {
-	logs.New().Debug("client send command list")
-	sh, err := s.db.List(0, 0)
-	if err != nil {
-		logs.New().Error(err)
-		return err
-	}
-	for _, v := range sh {
-		sendnews := pb.ShortNew{ID: v.ID,
-			Title:       v.Title,
-			Description: v.Description,
-			Url:         v.Url,
-			Time:        v.Time,
-			Hash:        int64(v.Hash)}
-		err = stream.Send(&sendnews)
 		if err != nil {
 			logs.New().Error(err)
 			return err
 		}
-
+		m.Convert(S)
+		err = s.db.AddNew(m) // ошибки добавления отправим роутеру
+		if err != nil {
+			StrErr = append(StrErr, m.Url+" "+err.Error())
+		}
+		i++
 	}
 	return nil
 }
 
 // вернуть  список новостей на странице
-func (s *RssServiceServer) ListPage(page *pb.Page, stream pb.RssService_ListPageServer) error {
+func (s *RssServiceServer) ListPage(ctx context.Context, page *pb.Page) (*pb.ArrayShortNews, error) {
 	logs.New().Debug("client send command list page")
-	sh, err := s.db.List(uint(page.Limit), uint(page.Offset))
+	sh, err := s.db.ListPage(int(page.GetLimit()),
+		int(page.GetPage()))
+
 	if err != nil {
 		logs.New().Error(err)
-		return err
+		return nil, err
 	}
+	var RPCNews pb.ArrayShortNews
 	for _, v := range sh {
 		sendnews := pb.ShortNew{ID: v.ID,
 			Title:       v.Title,
@@ -105,12 +87,74 @@ func (s *RssServiceServer) ListPage(page *pb.Page, stream pb.RssService_ListPage
 			Url:         v.Url,
 			Time:        v.Time,
 			Hash:        int64(v.Hash)}
-		err = stream.Send(&sendnews)
-		if err != nil {
-			logs.New().Error(err)
-			return err
-		}
-
+		RPCNews.Sl = append(RPCNews.Sl, &sendnews)
 	}
-	return nil
+	logs.New().Debug("client send command list proccesed count: ", len(RPCNews.GetSl()))
+	return &RPCNews, nil
+}
+
+// вернуть список последних новостей  для веб-интефейса
+func (s *RssServiceServer) List(ctx context.Context, list *pb.Forlist) (*pb.ArrayShortNews, error) {
+	logs.New().Debug("client send command list")
+	sh, err := s.db.List(int(list.GetCount()))
+	if err != nil {
+		logs.New().Error(err)
+		return nil, err
+	}
+	var RPCNews pb.ArrayShortNews
+	for _, v := range sh {
+		sendnews := pb.ShortNew{ID: v.ID,
+			Title:       v.Title,
+			Description: v.Description,
+			Url:         v.Url,
+			Time:        v.Time,
+			Hash:        int64(v.Hash)}
+		RPCNews.Sl = append(RPCNews.Sl, &sendnews)
+	}
+	logs.New().Debug("client send command list proccesed count: ", len(RPCNews.GetSl()))
+	return &RPCNews, nil
+
+}
+
+// детальная новость
+func (s *RssServiceServer) GetNews(ctx context.Context, list *pb.Forlist) (*pb.ShortNew, error) {
+	logs.New().Debug("client send command  full news ")
+	v, err := s.db.GetNews(int(list.GetCount()))
+	if err != nil {
+		logs.New().Error(err)
+		return nil, err
+	}
+	sendnews := pb.ShortNew{ID: v.ID,
+		Title:       v.Title,
+		Description: v.Description,
+		Url:         v.Url,
+		Time:        v.Time,
+		Hash:        int64(v.Hash)}
+
+	logs.New().Debug("client send command full news  proccesed ")
+	return &sendnews, nil
+}
+
+// поиск новостей
+func (s *RssServiceServer) Search(ctx context.Context, f *pb.Filter) (*pb.ArrayShortNews, error) {
+
+	logs.New().Debug("client send command search")
+	fdb := model.Convert(f)
+	sh, err := s.db.Search(fdb)
+	if err != nil {
+		logs.New().Error(err)
+		return nil, err
+	}
+	var RPCNews pb.ArrayShortNews
+	for _, v := range sh {
+		sendnews := pb.ShortNew{ID: v.ID,
+			Title:       v.Title,
+			Description: v.Description,
+			Url:         v.Url,
+			Time:        v.Time,
+			Hash:        int64(v.Hash)}
+		RPCNews.Sl = append(RPCNews.Sl, &sendnews)
+	}
+	logs.New().Debug("client send command search proccesed count: ", len(RPCNews.GetSl()))
+	return &RPCNews, nil
 }
