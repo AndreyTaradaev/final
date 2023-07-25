@@ -1,0 +1,6 @@
+time="25-Jul-2023 18:03:37.55" level=info msg="config loaded, start program...." app=__debug_bin2054904298
+time="25-Jul-2023 18:03:37.58" level=info msg="cmdline:  -config e:\\Go\\skilfactory\\module40\\final\\apigw\\cmd/config.json" app=__debug_bin2054904298
+time="25-Jul-2023 18:03:37.58" level=info msg="Start thread dowload rss" app=__debug_bin2054904298
+time="25-Jul-2023 18:03:37.58" level=info msg="Init Http router" app=__debug_bin2054904298
+time="25-Jul-2023 18:03:37.58" level=info msg="запуск потока загрузки новостей" app=__debug_bin2054904298
+time="25-Jul-2023 18:03:37.91" level=info msg="Init Http server" app=__debug_bin2054904298

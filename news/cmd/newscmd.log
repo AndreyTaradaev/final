@@ -335,3 +335,5 @@ time="25-Jul-2023 11:13:09.23" level=info msg="командная строка  
 time="25-Jul-2023 17:17:08.78" level=info msg="запуск приложения" app=newscmd
 time="25-Jul-2023 17:17:08.81" level=info msg="командная строка  -config E:\\Go\\skilfactory\\module40\\final\\news\\cmd/config.json" app=newscmd
 time="25-Jul-2023 17:35:35.64" level=error msg="rpc error: code = Canceled desc = context canceled" app=newscmd
+time="25-Jul-2023 17:58:46.63" level=info msg="запуск приложения" app=newscmd
+time="25-Jul-2023 17:58:46.65" level=info msg="командная строка  -config E:\\Go\\skilfactory\\module40\\final\\news\\cmd/config.json" app=newscmd

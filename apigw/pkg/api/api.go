@@ -99,33 +99,30 @@ func (api *API) page(w http.ResponseWriter, r *http.Request) {
 }
 func (api *API) list(w http.ResponseWriter, r *http.Request) {}
 
-const limit int = 20
-
 func (api *API) news(w http.ResponseWriter, r *http.Request) {
-
-	pageParam := r.URL.Query().Get("page")
-	//var iPage int
-	if len(pageParam) == 0 {
-		//	iPage = 1
-	} else {
-		/* 	P, err := strconv.Atoi(pageParam)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		*/ //	iPage = P
+	if r.Method == http.MethodOptions {
+		return
 	}
-	/* arrayNews, err := api.nClient.RunRssServicePage(int32(iPage), int32(limit))
+	pageStr := mux.Vars(r)["id"]
+	P, err := strconv.ParseUint(pageStr,10,64)	
 	if err != nil {
-		logger.Error("error cal rpc func page  from RPC server ", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	ret, _ := json.Marshal(arrayNews.Get())
-	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(ret))) */
-	w.Header().Set("Page", pageParam)
+	arrayNews, err := api.nClient.RunRssServiceList(P)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	ret, err := json.Marshal(arrayNews.Get())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(ret)))
 	w.Header().Set("Endpoint", "news")
-	//w.Write(ret)
+	w.Header().Set("count ", pageStr)
+	w.Write(ret)
 }
 
 // Получаем весь список новостей (сокращенно)
