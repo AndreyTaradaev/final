@@ -2,9 +2,64 @@ package model
 
 import (
 	pb "gateway/internal/rpc"
+	"strconv"
+	"strings"
 )
 
-// перечисления.
+// возвращает параметр поиска .
+func WordParam(Param string /* число в виде строки*/) pb.OptionSearch {
+
+	ParamInt := GetIntDef(Param, 1)
+	switch ParamInt  {
+	case 0:
+		return pb.OptionSearch_WholeWord
+	case 1:
+		return pb.OptionSearch_WordPart
+	case 2:
+		return pb.OptionSearch_WordExclude
+	case 3:
+		return pb.OptionSearch_WordPartExclude
+	}
+	return pb.OptionSearch_WordPart
+}
+
+// возвращает поле сортировки.
+func FieldSort(sort string) pb.FIELD_SORT {
+	lowersort := strings.ToLower(sort)
+	switch lowersort {
+	case "id":
+		return pb.FIELD_SORT_FIELD_ID
+	case "title":
+		return pb.FIELD_SORT_FIELD_TITLE
+	case "desc":
+		return pb.FIELD_SORT_FIELD_DESC
+	case "date":
+		return pb.FIELD_SORT_FIELD_DATE
+	case "url":
+		return pb.FIELD_SORT_FIELD_URL
+	}
+	return pb.FIELD_SORT_FIELD_DATE
+}
+
+// возвращает вид сортировки .
+func TypeSort(typesort string) pb.OrderSORT {
+
+	if strings.EqualFold(typesort, "asc") {
+		return pb.OrderSORT_SORT_ASC
+	}
+	return pb.OrderSORT_SORT_DESC
+}
+
+// конвертирует строку в число если ошибка возвращает значение по умолчанию.
+func GetIntDef(value string, def int64) int64 {
+	v, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		return def
+	}
+	return v
+}
+
+/* // перечисления.
 // параметры поиска по слову.
 type wordoption int32
 
@@ -172,6 +227,7 @@ func New() *Filter {
 	fdb.sort.field = fieldSort(fs)
 	fdb.sort.order = (fs.GetSort() == pb.OrderSORT_SORT_ASC)
 	fdb.filterDate.startDate = f.GetPeriod().GetStartDate()
-	fdb.filterDate.endDate = f.GetPeriod().GetEndDate() */
+	fdb.filterDate.endDate = f.GetPeriod().GetEndDate()
 	return fdb
 }
+*/

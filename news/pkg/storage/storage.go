@@ -1,13 +1,11 @@
+// пакет работы с БД новостей
 package storage
 
 import (
 	"context"
 	"errors"
-
-	//logs "gateway/internal/log"
 	"gateway/internal/model"
 	"os"
-
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -42,10 +40,10 @@ const (
 FROM "NewsRss" where id = $1;`
 	searchSql string = `SELECT id, title, description, "time", url, hashrss
 FROM "NewsRss" where 
-( $4 ='' or   ( -- поиск по слову
-title %s $1 
-or description %s $1
-or url %s $1
+( $1 ='' or   ( -- поиск по слову
+title %s '%%'||$1||'%%' 
+or description %s '%%'||$1||'%%'
+or url %s '%%'||$1||'%%'
 ))
 and ($2=0 or "time" >=$2 )
 and ($3=0 or "time" <=$3 )
@@ -76,7 +74,7 @@ func New() (*DB, error) {
 	return &db, nil
 }
 
-// закрытие соединения с БД
+// закрытие соединения с БД.
 func (db *DB) Close() {
 	if db.pool != nil {
 		db.pool.Close()
@@ -98,7 +96,7 @@ func (db *DB) AddNew(news model.Short) error {
 	return nil
 }
 
-// //вернуть список последних новостей  для веб-интефейса. сокращенно
+// вернуть список последних новостей  для веб-интефейса. сокращенно.
 func (db *DB) List(n int) ([]model.Short, error) {
 	rows, err := db.pool.Query(context.Background(), listSQL,
 		n,
@@ -190,60 +188,12 @@ func (db *DB) GetNews(i int) (model.Short, error) {
 	return *mod, nil
 }
 
-// получение новостей по Фильтру
-func (db *DB) Search(f *model.Filter) ([]model.Short, error) {
-	sql := "" //f.SQL()
-	rows, err := db.pool.Query(context.Background(), sql)
-	if err != nil {
-		return nil, err
-	}
-	var ret model.ShortNews
-	for rows.Next() {
-		var id, time, hash *int64
-		var title, desc, url *string
-		err = rows.Scan(
-			&id,
-			&desc,
-			&title,
-			&url,
-			&time,
-			&hash,
-		)
-		if err != nil {
-			return nil, err
-		}
-		ret.AddFromData(id, title, desc, time, url, hash)
-	}
-	return ret.Get(), rows.Err()
-}
-
-// News возвращает последние новости из БД. по страницам
-// limit -- количество на выводимых новостей
-// offset -- номер страницы с 1 начинается
-//параметр full определяет вывод новости сокращенно или полную
-// если лимит 0 тогда все выводим содержание новости обрезаем если длина больше 100 символов
-/* func (db *DB) List(limit, Page int,full bool) ([]model.Short, error) {
-	var i = 1<<63 - 1
-	var offset int
-	if limit == 0 { // если лимита нет, ставим максимальый
-		limit = i
-		offset = 0
-	} else { //количество новостей на странице равно limit
-		if Page != 0 {
-			Page--
-		}
-		offset = Page * limit
-	}
-	// when $1<$3 then  description
-	var intfull int = limit+1
-	if !full {
-		intfull =  limit-1
-	}
-
-	rows, err := db.pool.Query(context.Background(), ListSQL,
-		limit,
-		offset,
-		intfull,
+// получение новостей по Фильтру.
+func (db *DB) Search(sql string, word string, startdate, enddate int64) ([]model.Short, error) {
+	rows, err := db.pool.Query(context.Background(), sql,
+		word,
+		startdate,
+		enddate,
 	)
 	if err != nil {
 		return nil, err
@@ -254,10 +204,10 @@ func (db *DB) Search(f *model.Filter) ([]model.Short, error) {
 		var title, desc, url *string
 		err = rows.Scan(
 			&id,
-			&desc,
 			&title,
-			&url,
+			&desc,
 			&time,
+			&url,
 			&hash,
 		)
 		if err != nil {
@@ -266,6 +216,4 @@ func (db *DB) Search(f *model.Filter) ([]model.Short, error) {
 		ret.AddFromData(id, title, desc, time, url, hash)
 	}
 	return ret.Get(), rows.Err()
-} */
-
-/* */
+}

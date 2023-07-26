@@ -54,7 +54,7 @@ func Help() string {
 
 //=====================================================================================
 
-// ctor for config-object
+// ctor for config-object.
 func New() *config {
 	once.Do(func() {
 		apiconfig = config{conf: config_imp{Port: 12345, Logdir: ""}}
@@ -62,8 +62,7 @@ func New() *config {
 	return &apiconfig
 }
 
-// загрузка конфигурации из ENV
-
+// загрузка конфигурации из ENV.
 func (c *config) loadFromEnv() {
 	variable := os.Getenv("NEWSPORT")
 	if len(variable) != 0 {
@@ -78,13 +77,13 @@ func (c *config) loadFromEnv() {
 	}
 }
 
-// interface stringer
+// interface stringer.
 func (c *config) String() string {
 	ret := fmt.Sprintf("newsport: %d, logdir: %s ", c.conf.Port, c.conf.Logdir)
 	return ret
 }
 
-// загрузка конфигурации из файла
+// загрузка конфигурации из файла.
 func (c *config) Load(file string) error {
 	//если	 file пустой ищем  конфиг  в  директории исполняемого файла
 	if len(file) == 0 {

@@ -153,13 +153,31 @@ func (d *RPClient) RunRssServiceGetNews(n uint64) (*model.Short, error) {
 }
 
 // поиск по фильтру
-func (d *RPClient) RunRssServiceSearch(f *model.Filter) (*model.ShortNews, error) {
+func (d *RPClient) RunRssServiceSearch(word string, // слово для поиска
+	paramword string, // параметр для поиска
+	fieldsort string, //поле для сортировки
+	typesort string, //тип сортировки
+	startDate string, //начальная дата
+	endDate string, //конечнаядата дата
+) (*model.ShortNews, error) {
+	//формируем структуру фильтра поиска
+	pbFilter := pb.Filter{
+		Word: &pb.FindWord{
+			Search: word,
+			Option: model.WordParam(paramword)},
+		Sort: &pb.OptionSort{
+			Field: model.FieldSort(fieldsort),
+			Sort:  model.TypeSort(typesort)},
+		Period: &pb.FilterDate{
+			StartDate: model.GetIntDef(startDate, 0),
+			EndDate:   model.GetIntDef(endDate, 0)},
+	}
+
 	var sn model.ShortNews
 	client := pb.NewRssServiceClient(d.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.timeout)*time.Second)
 	defer cancel()
-	fb := f.ToPB()
-	array, err := client.Search(ctx, fb)
+	array, err := client.Search(ctx, &pbFilter)
 	if err != nil {
 		return nil, err
 	}

@@ -8,6 +8,7 @@
    "request_period": 180,   	
 	  "newsport" : 10000,    
 	"commentport": 10001,
+	"port" : 80,
 	"logdir": "e:/Go/skilfactory/module40/final/apigw/cmd"
 	
 }
