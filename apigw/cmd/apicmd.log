@@ -721,3 +721,37 @@ time="26-Jul-2023 15:20:35.76" level=debug msg="Parametr search: word \"go\", ty
 time="26-Jul-2023 15:20:52.80" level=debug msg="map[Accept:[text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8] Accept-Encoding:[gzip, deflate, br] Accept-Language:[ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3] Connection:[keep-alive] Dnt:[1] Sec-Fetch-Dest:[document] Sec-Fetch-Mode:[navigate] Sec-Fetch-Site:[none] Sec-Fetch-User:[?1] Sec-Gpc:[1] Upgrade-Insecure-Requests:[1] User-Agent:[Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0]]" func="gateway/apigw/pkg/api.(*API).headersMiddleware.func1()" file="api.go:212" app=apicmd
 time="26-Jul-2023 15:20:52.80" level=debug msg="/news/filter?word=go&sort=time&direction=ASC&type=0" func="gateway/apigw/pkg/api.(*API).headersMiddleware.func1()" file="api.go:213" app=apicmd
 time="26-Jul-2023 15:20:52.80" level=debug msg="Parametr search: word \"go\", type \"0\", field \"time\",direction \"ASC\",startdate \"\", enddate \"\"" func="gateway/apigw/pkg/api.(*API).search()" file="api.go:77" app=apicmd
+time="26-Jul-2023 15:34:06.36" level=info msg="config loaded, start program...." func="main.main()" file="apicmd.go:42" app=apicmd
+time="26-Jul-2023 15:34:06.39" level=info msg="cmdline:  -config e:\\Go\\skilfactory\\module40\\final\\apigw\\cmd\\config.json -debug" func="main.main()" file="apicmd.go:43" app=apicmd
+time="26-Jul-2023 15:34:06.39" level=debug msg="loaded config  Urls: \n\thttps://habr.com/ru/rss/hub/go/all/?fl=ru\n\thttps://habr.com/ru/rss/best/daily/?fl=ru\n\thttps://cprss.s3.amazonaws.com/golangweekly.com.xml\n\thttps://lenta.ru/rss\nPeriod: 180\nPort: 80,\nNewsHost: localhost\n NewsPort: 10000\nCommentHost: localhost\nCommmentPort: 10001\nLogDir: e:/Go/skilfactory/module40/final/apigw/cmd" func="main.main()" file="apicmd.go:45" app=apicmd
+time="26-Jul-2023 15:34:06.39" level=info msg="Start thread dowload rss" func="main.main()" file="apicmd.go:52" app=apicmd
+time="26-Jul-2023 15:34:06.39" level=info msg="Init Http router" func="main.main()" file="apicmd.go:54" app=apicmd
+time="26-Jul-2023 15:34:06.39" level=info msg="запуск потока загрузки новостей" func="gateway/apigw/pkg/rss.LoadNews()" file="rss.go:15" app=apicmd
+time="26-Jul-2023 15:34:06.39" level=debug msg=" RPC connect  server: localhost:10000" func="gateway/apigw/pkg/rpcclient.Connect()" file="service.go:39" app=apicmd
+time="26-Jul-2023 15:34:06.71" level=debug msg="Init router http" func="gateway/apigw/pkg/api.New()" file="api.go:34" app=apicmd
+time="26-Jul-2023 15:34:06.71" level=info msg="Init Http server" func="main.main()" file="apicmd.go:61" app=apicmd
+time="26-Jul-2023 15:34:39.21" level=debug msg="map[Accept:[text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8] Accept-Encoding:[gzip, deflate, br] Accept-Language:[ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3] Connection:[keep-alive] Dnt:[1] Sec-Fetch-Dest:[document] Sec-Fetch-Mode:[navigate] Sec-Fetch-Site:[none] Sec-Fetch-User:[?1] Sec-Gpc:[1] Upgrade-Insecure-Requests:[1] User-Agent:[Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0]]" func="gateway/apigw/pkg/api.(*API).headersMiddleware.func1()" file="api.go:212" app=apicmd
+time="26-Jul-2023 15:34:39.21" level=debug msg="/news/filter?word=go&sort=time&direction=ASC&type=0" func="gateway/apigw/pkg/api.(*API).headersMiddleware.func1()" file="api.go:213" app=apicmd
+time="26-Jul-2023 15:34:39.21" level=debug msg="Parametr search: word \"go\", type \"0\", field \"time\",direction \"ASC\",startdate \"\", enddate \"\"" func="gateway/apigw/pkg/api.(*API).search()" file="api.go:77" app=apicmd
+time="26-Jul-2023 15:37:06.90" level=debug msg="urls: https://habr.com/ru/rss/best/daily/?fl=ru , loaded 20 news" func="gateway/apigw/pkg/rss.LoadNews.func1()" file="rss.go:31" app=apicmd
+time="26-Jul-2023 15:37:06.91" level=debug msg="urls: https://habr.com/ru/rss/hub/go/all/?fl=ru , loaded 20 news" func="gateway/apigw/pkg/rss.LoadNews.func1()" file="rss.go:31" app=apicmd
+time="26-Jul-2023 15:37:07.02" level=debug msg="urls: https://lenta.ru/rss , loaded 200 news" func="gateway/apigw/pkg/rss.LoadNews.func1()" file="rss.go:31" app=apicmd
+time="26-Jul-2023 15:37:07.26" level=debug msg="urls: https://cprss.s3.amazonaws.com/golangweekly.com.xml , loaded 4 news" func="gateway/apigw/pkg/rss.LoadNews.func1()" file="rss.go:31" app=apicmd
+time="26-Jul-2023 15:37:07.83" level=debug msg="server return result, count error: 0 processed 4" func="gateway/apigw/pkg/rpcclient.(*RPClient).RunRssServiceAddNews()" file="service.go:101" app=apicmd
+time="26-Jul-2023 15:37:07.84" level=debug msg="server return result, count error: 0 processed 20" func="gateway/apigw/pkg/rpcclient.(*RPClient).RunRssServiceAddNews()" file="service.go:101" app=apicmd
+time="26-Jul-2023 15:37:07.96" level=debug msg="server return result, count error: 0 processed 20" func="gateway/apigw/pkg/rpcclient.(*RPClient).RunRssServiceAddNews()" file="service.go:101" app=apicmd
+time="26-Jul-2023 15:37:13.60" level=debug msg="server return result, count error: 0 processed 200" func="gateway/apigw/pkg/rpcclient.(*RPClient).RunRssServiceAddNews()" file="service.go:101" app=apicmd
+time="26-Jul-2023 15:40:06.77" level=debug msg="urls: https://habr.com/ru/rss/hub/go/all/?fl=ru , loaded 20 news" func="gateway/apigw/pkg/rss.LoadNews.func1()" file="rss.go:31" app=apicmd
+time="26-Jul-2023 15:40:06.81" level=debug msg="urls: https://habr.com/ru/rss/best/daily/?fl=ru , loaded 20 news" func="gateway/apigw/pkg/rss.LoadNews.func1()" file="rss.go:31" app=apicmd
+time="26-Jul-2023 15:40:06.96" level=debug msg="urls: https://lenta.ru/rss , loaded 200 news" func="gateway/apigw/pkg/rss.LoadNews.func1()" file="rss.go:31" app=apicmd
+time="26-Jul-2023 15:40:07.26" level=debug msg="urls: https://cprss.s3.amazonaws.com/golangweekly.com.xml , loaded 4 news" func="gateway/apigw/pkg/rss.LoadNews.func1()" file="rss.go:31" app=apicmd
+time="26-Jul-2023 15:40:07.77" level=debug msg="server return result, count error: 0 processed 4" func="gateway/apigw/pkg/rpcclient.(*RPClient).RunRssServiceAddNews()" file="service.go:101" app=apicmd
+time="26-Jul-2023 15:40:07.92" level=debug msg="server return result, count error: 0 processed 20" func="gateway/apigw/pkg/rpcclient.(*RPClient).RunRssServiceAddNews()" file="service.go:101" app=apicmd
+time="26-Jul-2023 15:40:07.96" level=debug msg="server return result, count error: 0 processed 20" func="gateway/apigw/pkg/rpcclient.(*RPClient).RunRssServiceAddNews()" file="service.go:101" app=apicmd
+time="26-Jul-2023 15:40:14.84" level=debug msg="server return result, count error: 0 processed 200" func="gateway/apigw/pkg/rpcclient.(*RPClient).RunRssServiceAddNews()" file="service.go:101" app=apicmd
+time="26-Jul-2023 17:04:23.06" level=info msg="config loaded, start program...." app=apicmd
+time="26-Jul-2023 17:04:23.10" level=info msg="cmdline:  -config E:\\Go\\skilfactory\\module40\\final\\apigw\\cmd/config.json" app=apicmd
+time="26-Jul-2023 17:04:23.10" level=info msg="Start thread dowload rss" app=apicmd
+time="26-Jul-2023 17:04:23.10" level=info msg="Init Http router" app=apicmd
+time="26-Jul-2023 17:04:23.10" level=info msg="запуск потока загрузки новостей" app=apicmd
+time="26-Jul-2023 17:04:23.46" level=info msg="Init Http server" app=apicmd

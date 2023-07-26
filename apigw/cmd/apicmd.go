@@ -8,9 +8,6 @@ import (
 	logs "gateway/internal/log"
 	tools "gateway/internal/tools"
 	"net/http"
-	//"gateway/apigw/pkg/api"
-	//"net/http"
-	//"log"
 )
 
 // программа является  машрутизатором от клиентов к микросервисам
