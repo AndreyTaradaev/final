@@ -296,3 +296,134 @@ var RssService_ServiceDesc = grpc.ServiceDesc{
 	},
 	Metadata: "apigetway.proto",
 }
+
+const (
+	CommentService_AddComment_FullMethodName  = "/rpc_news.CommentService/AddComment"
+	CommentService_TreeComment_FullMethodName = "/rpc_news.CommentService/TreeComment"
+)
+
+// CommentServiceClient is the client API for CommentService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type CommentServiceClient interface {
+	// add comment
+	AddComment(ctx context.Context, in *Comment, opts ...grpc.CallOption) (*Result, error)
+	// return tree comment for id news
+	TreeComment(ctx context.Context, in *Forlist, opts ...grpc.CallOption) (*TreeComments, error)
+}
+
+type commentServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewCommentServiceClient(cc grpc.ClientConnInterface) CommentServiceClient {
+	return &commentServiceClient{cc}
+}
+
+func (c *commentServiceClient) AddComment(ctx context.Context, in *Comment, opts ...grpc.CallOption) (*Result, error) {
+	out := new(Result)
+	err := c.cc.Invoke(ctx, CommentService_AddComment_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *commentServiceClient) TreeComment(ctx context.Context, in *Forlist, opts ...grpc.CallOption) (*TreeComments, error) {
+	out := new(TreeComments)
+	err := c.cc.Invoke(ctx, CommentService_TreeComment_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// CommentServiceServer is the server API for CommentService service.
+// All implementations must embed UnimplementedCommentServiceServer
+// for forward compatibility
+type CommentServiceServer interface {
+	// add comment
+	AddComment(context.Context, *Comment) (*Result, error)
+	// return tree comment for id news
+	TreeComment(context.Context, *Forlist) (*TreeComments, error)
+	mustEmbedUnimplementedCommentServiceServer()
+}
+
+// UnimplementedCommentServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedCommentServiceServer struct {
+}
+
+func (UnimplementedCommentServiceServer) AddComment(context.Context, *Comment) (*Result, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddComment not implemented")
+}
+func (UnimplementedCommentServiceServer) TreeComment(context.Context, *Forlist) (*TreeComments, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TreeComment not implemented")
+}
+func (UnimplementedCommentServiceServer) mustEmbedUnimplementedCommentServiceServer() {}
+
+// UnsafeCommentServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to CommentServiceServer will
+// result in compilation errors.
+type UnsafeCommentServiceServer interface {
+	mustEmbedUnimplementedCommentServiceServer()
+}
+
+func RegisterCommentServiceServer(s grpc.ServiceRegistrar, srv CommentServiceServer) {
+	s.RegisterService(&CommentService_ServiceDesc, srv)
+}
+
+func _CommentService_AddComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Comment)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommentServiceServer).AddComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommentService_AddComment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommentServiceServer).AddComment(ctx, req.(*Comment))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CommentService_TreeComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Forlist)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommentServiceServer).TreeComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommentService_TreeComment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommentServiceServer).TreeComment(ctx, req.(*Forlist))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// CommentService_ServiceDesc is the grpc.ServiceDesc for CommentService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var CommentService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "rpc_news.CommentService",
+	HandlerType: (*CommentServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "AddComment",
+			Handler:    _CommentService_AddComment_Handler,
+		},
+		{
+			MethodName: "TreeComment",
+			Handler:    _CommentService_TreeComment_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "apigetway.proto",
+}

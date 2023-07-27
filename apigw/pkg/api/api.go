@@ -60,7 +60,6 @@ func (api *API) endpoints() {
 
 	api.r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./webapp"))))
 	api.r.Use(api.headersMiddleware)
-
 }
 
 func (api *API) search(w http.ResponseWriter, r *http.Request) {
@@ -203,7 +202,7 @@ func (api *API) detail(w http.ResponseWriter, r *http.Request) {
 func (api *API) headersMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.String() == "/" {
-			w.Header().Set("Content-Type", "text/html; charset=utf-8")			
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		} else {
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		}

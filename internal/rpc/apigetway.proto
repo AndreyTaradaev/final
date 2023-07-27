@@ -99,3 +99,35 @@ service RssService {
     rpc GetNews (Forlist) returns (ShortNew) {}         //детальная новость 
     rpc Search  (Filter) returns (ArrayShortNews) {}    //поиск по фильтру  
  }
+
+ message Comment{    
+    int64 IdComment =1;    
+    int64    Parent = 2;
+    string   Content   = 3;
+     int64   IdNews   = 4;
+    reserved 8 ;          //int64    AuthorId  = 4; 
+    reserved  "unknown"; //string    Author   = 5 ;
+    int64     time  =7 ;
+    
+    //repeated   Comment  Answer = 7; 
+    }
+
+message branchComment{
+    Comment Parrent  = 1;
+    repeated Comment Child = 2;
+}
+
+message TreeComments{    
+    int64 idNews = 1;
+    repeated branchComment Comments = 2;
+}
+
+service CommentService {
+    // add comment 
+    rpc AddComment(Comment)returns (Result) {}
+    //return tree comment for id news
+    rpc TreeComment(Forlist) returns (TreeComments) {}       //вернуть дерево  комментариев
+   
+ }
+    
+ 
