@@ -755,3 +755,9 @@ time="26-Jul-2023 17:04:23.10" level=info msg="Start thread dowload rss" app=api
 time="26-Jul-2023 17:04:23.10" level=info msg="Init Http router" app=apicmd
 time="26-Jul-2023 17:04:23.10" level=info msg="запуск потока загрузки новостей" app=apicmd
 time="26-Jul-2023 17:04:23.46" level=info msg="Init Http server" app=apicmd
+time="26-Jul-2023 17:30:11.97" level=info msg="config loaded, start program...." app=apicmd
+time="26-Jul-2023 17:30:11.99" level=info msg="cmdline:  -config E:\\Go\\skilfactory\\module40\\final\\apigw\\cmd/config.json" app=apicmd
+time="26-Jul-2023 17:30:11.99" level=info msg="Start thread dowload rss" app=apicmd
+time="26-Jul-2023 17:30:11.99" level=info msg="Init Http router" app=apicmd
+time="26-Jul-2023 17:30:11.99" level=info msg="запуск потока загрузки новостей" app=apicmd
+time="26-Jul-2023 17:30:12.32" level=info msg="Init Http server" app=apicmd
