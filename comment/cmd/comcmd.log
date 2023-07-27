@@ -1,0 +1,6 @@
+time="27-Jul-2023 17:09:56.77" level=info msg="запуск приложения" func="main.main()" file="comcmd.go:36" app=comcmd
+time="27-Jul-2023 17:09:56.80" level=info msg="командная строка  -config e:\\Go\\skilfactory\\module40\\final\\comment\\cmd/config.json -debug" func="main.main()" file="comcmd.go:37" app=comcmd
+time="27-Jul-2023 17:09:56.80" level=debug msg=" Параметры конфигурации commentport: 10001, logdir: ./ " func="main.main()" file="comcmd.go:38" app=comcmd
+time="27-Jul-2023 17:09:56.80" level=debug msg="настрока параметров соединения  сервера" func="main.main()" file="comcmd.go:39" app=comcmd
+time="27-Jul-2023 17:09:56.93" level=debug msg="map[rpc_news.CommentService:{[{AddComment false false} {TreeComment false false}] apigetway.proto}]" func="gateway/comment/pkg/service.RunServer()" file="service.go:28" app=comcmd
+time="27-Jul-2023 17:10:30.36" level=error msg="ОШИБКА: INSERT или UPDATE в таблице \"newscomments\" нарушает ограничение внешнего ключа \"newscomments_parent_fkey\" (SQLSTATE 23503)" func="gateway/comment/pkg/service.(*CommentServer).AddComment()" file="service.go:47" app=comcmd

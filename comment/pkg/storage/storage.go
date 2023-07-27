@@ -4,17 +4,18 @@ package storage
 import (
 	"context"
 	"errors"
+
 	//"gateway/internal/model"
 	pb "gateway/internal/rpc"
 	"os"
-
+"fmt"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 const (
 	addComment string = `INSERT INTO newscomments
 	(id_news, "Content", parent, "time")
-	VALUES($1, $2, $3, $4);	`
+	VALUES($1, $2, $3, $4) RETURNING id; `
 	listSQL string = `
 	with  repl as( SELECT id , trim( regexp_replace(description, '^[\\r\\n\\t ]*|[\\r\\n\\t ]*$', ''))as  description , title, url , "time",hashrss
 	FROM "NewsRss" order by "time" desc limit $1 offset $2
@@ -73,17 +74,19 @@ func (db *DB) Close() {
 }
 
 // сохранение новости в БД.
-func (db *DB) AddComment(comment *pb.Comment) error {
-	_, err := db.pool.Exec(context.Background(), addComment, // (id_news, "Content", parent, "time", checked, banned)
+func (db *DB) AddComment(comment *pb.Comment) (int64, error) {
+	var id int64
+	fmt.Println(comment)
+	err := db.pool.QueryRow(context.Background(), addComment, // (id_news, "Content", parent, "time", checked, banned)
 		comment.GetIdNews(),
 		comment.GetContent(),
 		comment.GetParent(),
 		comment.GetTime(),
-	)
+	).Scan(&id)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return id, nil
 }
 
 // вернуть список последних новостей  для веб-интефейса. сокращенно.
@@ -207,4 +210,4 @@ func (db *DB) Search(sql string, word string, startdate, enddate int64) ([]model
 	}
 	return ret.Get(), rows.Err()
 }
- */
+*/

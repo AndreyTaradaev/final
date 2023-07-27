@@ -45,7 +45,7 @@ func newServer() (*RssServiceServer, error) {
 // добавить новости.
 func (s *RssServiceServer) AddNews(stream pb.RssService_AddNewsServer) error {
 	var StrErr []string
-	var i int32 = 0
+	var i int64 = 0
 	var m model.Short
 	logs.New().Debugln("client send  data")
 	for {

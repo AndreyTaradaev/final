@@ -120,13 +120,14 @@ func (s *ShortNews) Get() []Short {
 // структура коментариев.
 // Структура коментариея для обработки.
 type Comment struct {
-	IdComment int64      `json:"id"`
-	Parent    int64      `json:"parent"`
+	IdComment int64      `json:"id,omitempty"`
+	Parent    int64      `json:"parent,omitempty"`
 	Content   string     `json:"content"`
-	AuthorId  int64      `json:"authorid"`
-	Author    string     `json:"author"`
-	Timestamp int64      `json:"time"`
-	Answer    []*Comment `json:"anwser"`
+	IdNews    int64      `json:"idnews"`
+	AuthorId  int64      `json:"authorid,omitempty"`
+	Author    string     `json:"author,omitempty"`
+	Time      int64      `json:"time"`
+	Answer    []*Comment `json:"anwser,omitempty"`
 }
 
 // ctor for comment
@@ -137,7 +138,7 @@ func CreateComment(Id, Par int64, Cont, Aut string, AutId, time int64) *Comment 
 	c.Content = Cont
 	c.AuthorId = AutId
 	c.Author = Aut
-	c.Timestamp = time
+	c.Time = time
 	return c
 }
 

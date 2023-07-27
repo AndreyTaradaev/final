@@ -7,6 +7,7 @@ import (
 	"gateway/apigw/pkg/rpcclient"
 	logs "gateway/internal/log"
 	"gateway/internal/model"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -15,21 +16,27 @@ import (
 
 type API struct {
 	r       *mux.Router
-	nClient *rpcclient.RPClient
-	cClient *rpcclient.RPClient
+	nClient model.NewsClient
+	cClient model.CommentClient
 }
 
 const timeout int = 120
 
 // Конструктор API.
-func New(newsTarget, comenttarget string) (*API, error) {
+func New(newstr, commentstr string) (*API, error) {
 	logger := logs.New()
-	newsclient, err := rpcclient.Connect(newsTarget, timeout)
+	newsclient, err := rpcclient.Connect(newstr, timeout)
 	if err != nil {
 		return nil, err
 	}
 
-	a := API{r: mux.NewRouter(), nClient: newsclient}
+	commentclient, err := rpcclient.Connect(commentstr, timeout)
+	if err != nil {
+		newsclient.Close()
+		return nil, err
+	}
+
+	a := API{r: mux.NewRouter(), nClient: newsclient, cClient: commentclient}
 	a.endpoints()
 	logger.Debug("Init router http")
 	return &a, nil
@@ -45,21 +52,45 @@ func (api *API) Router() *mux.Router {
 func (api *API) endpoints() {
 	api.r.HandleFunc("/news/page={id:[0-9]+}", api.page).Methods(http.MethodGet, http.MethodOptions) // получить список  новостей  со страницы (сокращенно)
 	api.r.HandleFunc("/news/{id:[0-9]+}", api.news).Methods(http.MethodGet, http.MethodOptions)      //вернуть список последних новостей  для веб-интефейса
-	api.r.HandleFunc("/news/filter", api.search).Methods(http.MethodGet, http.MethodOptions)         //вернуть список  новостей  по фильтру
+	api.r.HandleFunc("/news/search", api.search).Methods(http.MethodGet, http.MethodOptions)         //вернуть список  новостей  по фильтру
 	// получить полную новость (c коментариями)
-	api.r.HandleFunc("/news?detail={id:[0-9]+}", api.detail).Methods(http.MethodGet, http.MethodOptions) ///детальная новость
+	api.r.HandleFunc("/news/detail={id:[0-9]+}", api.detail).Methods(http.MethodGet, http.MethodOptions) ///детальная новость
 
 	api.r.HandleFunc("/news/list", api.list).Methods(http.MethodGet, http.MethodOptions) //весь список (последнюю 1000)
 
 	// добавить комментарий
-	api.r.HandleFunc("/comment/{id:[0-9]+}", api.news).Methods(http.MethodPost, http.MethodOptions)
+	api.r.HandleFunc("/comment/{id:[0-9]+}", api.addcomment).Methods(http.MethodPost, http.MethodOptions)
 	// получить комментарий
 	api.r.HandleFunc("/comment/{id:[0-9]+}", api.news).Methods(http.MethodGet, http.MethodOptions)
-	// удалить комментарий
-	api.r.HandleFunc("/comment/{id:[0-9]+}", api.news).Methods(http.MethodDelete, http.MethodOptions)
-
 	api.r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./webapp"))))
 	api.r.Use(api.headersMiddleware)
+}
+
+func (api *API) addcomment(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodOptions {
+		return
+	}
+	defer r.Body.Close()
+
+	b, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	var strucBody model.Comment //
+
+	err = json.Unmarshal(b, &strucBody)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	id, err := api.cClient.AddComment(&strucBody)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	w.Header().Set("id", fmt.Sprintf("%d", id))
+	w.Write([]byte("ok"))
+	w.WriteHeader(http.StatusOK)
 }
 
 func (api *API) search(w http.ResponseWriter, r *http.Request) {
@@ -75,7 +106,7 @@ func (api *API) search(w http.ResponseWriter, r *http.Request) {
 	enddate := r.URL.Query().Get("enddate")
 	logs.New().Debugf(`Parametr search: word "%s", type "%s", field "%s",direction "%s",startdate "%s", enddate "%s"`, word, typesearch, sort, direction, startdate, enddate)
 
-	arrayNews, err := api.nClient.RunRssServiceSearch(word, typesearch, sort, direction, startdate, enddate)
+	arrayNews, err := api.nClient.SearchNews(word, typesearch, sort, direction, startdate, enddate)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -106,7 +137,7 @@ func (api *API) page(w http.ResponseWriter, r *http.Request) {
 	}
 	count := model.GetIntDef(countStr, 20)
 
-	arrayNews, err := api.nClient.RunRssServiceListPage(uint32(page), uint32(count))
+	arrayNews, err := api.nClient.ListPageNews(uint32(page), uint32(count))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -135,7 +166,7 @@ func (api *API) news(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	arrayNews, err := api.nClient.RunRssServiceList(P)
+	arrayNews, err := api.nClient.ListNews(P)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -156,7 +187,7 @@ func (api *API) list(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodOptions {
 		return
 	}
-	arrayNews, err := api.nClient.RunRssServiceList(1000) // последнюю 1000 новостей
+	arrayNews, err := api.nClient.ListNews(1000) // последнюю 1000 новостей
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -182,7 +213,7 @@ func (api *API) detail(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "id = "+idstr+"\n"+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	news, err := api.nClient.RunRssServiceGetNews(id)
+	news, err := api.nClient.DetailNews(id)
 	if err != nil {
 		http.Error(w, "id = "+idstr+"\n"+err.Error(), http.StatusInternalServerError)
 		return

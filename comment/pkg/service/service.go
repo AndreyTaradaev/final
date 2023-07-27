@@ -42,12 +42,12 @@ func newServer() (*CommentServer, error) {
 
 // добавить комментарий.
 func (s *CommentServer) AddComment(ctx context.Context, c *pb.Comment) (*pb.Result, error) {
-	err := s.db.AddComment(c)
+	id,err := s.db.AddComment(c)
 	if err != nil {
 		logs.New().Errorln(err)
 		return nil, err
 	}
-	return &pb.Result{}, nil
+	return &pb.Result{Ret: id}, nil
 }
 
 // вернуть  список новостей на странице.
