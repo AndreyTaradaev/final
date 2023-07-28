@@ -152,6 +152,14 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "delComment",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
 		}
 	]
 }
