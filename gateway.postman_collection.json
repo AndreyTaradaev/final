@@ -1,0 +1,157 @@
+{
+	"info": {
+		"_postman_id": "d6d14340-0f11-4621-9145-a345c89717aa",
+		"name": "gateway",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "ListPage",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localost/news/page=2",
+					"host": [
+						"localost"
+					],
+					"path": [
+						"news",
+						"page=2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "for web",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost/news/50",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"news",
+						"50"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "detail",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "List",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost/news/list",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"news",
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "filter",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost/news/search?word=go&type=1&sort=date&direction=asc &startdate&enddate",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"news",
+						"search"
+					],
+					"query": [
+						{
+							"key": "word",
+							"value": "go",
+							"description": "find word"
+						},
+						{
+							"key": "type",
+							"value": "1",
+							"description": "type search (0-4)"
+						},
+						{
+							"key": "sort",
+							"value": "date",
+							"description": "field sort:   id, date, title, desc, url"
+						},
+						{
+							"key": "direction",
+							"value": "asc ",
+							"description": "order sort :asc , desc"
+						},
+						{
+							"key": "startdate",
+							"value": null,
+							"description": "integer time unix format begin filter date"
+						},
+						{
+							"key": "enddate",
+							"value": null,
+							"description": "integer time unix format end filter date"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "addComment",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost/comment/12345",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"comment",
+						"12345"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getComments",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost/comment/1230123",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"comment",
+						"1230123"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -7,8 +7,6 @@ import (
 	logs "gateway/internal/log"
 	"gateway/internal/model"
 	pb "gateway/internal/rpc"
-
-	//"io"
 	"time"
 
 	"google.golang.org/grpc"
@@ -37,7 +35,7 @@ func Connect(target string, time_out int) (*RPClient, error) {
 	}
 	ret := RPClient{timeout: time_out}
 	logs.New().Debug(" RPC connect  server: ", target)
-	client, err := grpc.Dial(target, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock() /* , grpc.WithKeepaliveParams(kacp) */)
+	client, err := grpc.Dial(target, grpc.WithTransportCredentials(insecure.NewCredentials()) /*grpc.WithBlock()  ,*/, grpc.WithKeepaliveParams(kacp))
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +50,8 @@ func ConnectWithContext(target string, time_out int) (*RPClient, error) {
 		return nil, fmt.Errorf("server RPC is emply")
 	}
 	ret := RPClient{timeout: time_out}
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*time.Duration(ret.timeout))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(ret.timeout))
+	defer cancel()
 	client, err := grpc.DialContext(ctx, target, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
 		return nil, err
@@ -104,8 +103,8 @@ func (d *RPClient) AddNews(s *model.ShortNews) error {
 
 // получение списка новостей по RPC
 // вернуть  список новостей на странице
-func (d *RPClient) ListPageNews(Page, limit uint32) (*model.ShortNews, error) {
-	var sn model.ShortNews
+func (d *RPClient) ListPageNews(Page, limit uint32) ([]*pb.ShortNew, error) {
+
 	client := pb.NewRssServiceClient(d.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.timeout)*time.Second)
 	defer cancel()
@@ -114,15 +113,13 @@ func (d *RPClient) ListPageNews(Page, limit uint32) (*model.ShortNews, error) {
 	if err != nil {
 		return nil, err
 	}
-	for _, v := range array.GetSl() {
-		sn.Append(v)
-	}
-	return &sn, nil
+
+	return array.GetSl(), nil
 }
 
 // вернуть список последних новостей  для веб-интефейса
-func (d *RPClient) ListNews(n uint64) (*model.ShortNews, error) {
-	var sn model.ShortNews
+func (d *RPClient) ListNews(n uint64) ([]*pb.ShortNew, error) {
+
 	client := pb.NewRssServiceClient(d.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.timeout)*time.Second)
 	defer cancel()
@@ -131,15 +128,12 @@ func (d *RPClient) ListNews(n uint64) (*model.ShortNews, error) {
 	if err != nil {
 		return nil, err
 	}
-	for _, v := range array.GetSl() {
-		sn.Append(v)
-	}
-	return &sn, nil
+
+	return array.GetSl(), nil
 }
 
 // детальная новость
-func (d *RPClient) DetailNews(n uint64) (*model.Short, error) {
-	var sn model.Short
+func (d *RPClient) DetailNews(n uint64) (*pb.ShortNew, error) {
 	client := pb.NewRssServiceClient(d.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.timeout)*time.Second)
 	defer cancel()
@@ -148,8 +142,7 @@ func (d *RPClient) DetailNews(n uint64) (*model.Short, error) {
 	if err != nil {
 		return nil, err
 	}
-	sn.Convert(news)
-	return &sn, nil
+	return news, nil
 }
 
 // поиск по фильтру
@@ -158,7 +151,7 @@ func (d *RPClient) SearchNews(word string, // слово для поиска
 	fieldsort string, //поле для сортировки
 	typesort string, //тип сортировки
 	startDate string, //начальная дата
-	endDate string) (*model.ShortNews, error) {
+	endDate string) ([]*pb.ShortNew, error) {
 	//формируем структуру фильтра поиска
 	pbFilter := pb.Filter{
 		Word: &pb.FindWord{
@@ -171,8 +164,6 @@ func (d *RPClient) SearchNews(word string, // слово для поиска
 			StartDate: model.GetIntDef(startDate, 0),
 			EndDate:   model.GetIntDef(endDate, 0)},
 	}
-
-	var sn model.ShortNews
 	client := pb.NewRssServiceClient(d.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.timeout)*time.Second)
 	defer cancel()
@@ -180,10 +171,7 @@ func (d *RPClient) SearchNews(word string, // слово для поиска
 	if err != nil {
 		return nil, err
 	}
-	for _, v := range array.GetSl() {
-		sn.Append(v)
-	}
-	return &sn, nil
+	return array.GetSl(), nil
 }
 
 // Добавление коментария
@@ -193,10 +181,11 @@ func (d *RPClient) AddComment(c *model.Comment) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.timeout)*time.Second)
 	defer cancel()
 	in := pb.Comment{IdComment: c.IdComment,
-		Parent:  c.Parent,
-		Content: c.Content,
-		IdNews:  c.IdNews,
-		Time:    c.Time,
+		Parent:   c.Parent,
+		Content:  c.Content,
+		IdNews:   c.IdNews,
+		Time:     c.Time,
+		AuthorId: c.AuthorId,
 	}
 
 	reply, err := client.AddComment(ctx, &in)
@@ -204,4 +193,31 @@ func (d *RPClient) AddComment(c *model.Comment) (int64, error) {
 		return 0, err
 	}
 	return reply.GetRet(), nil
+}
+
+// получение дерева коментариев
+func (d *RPClient) Comments(idnews int64) (map[int64]*pb.Comment, error) {
+
+	client := pb.NewCommentServiceClient(d.client)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.timeout)*time.Second)
+	defer cancel()
+	f := pb.Forlist{Count: uint64(idnews)}
+	ar, err := client.TreeComment(ctx, &f)
+	if err != nil {
+		return nil, err
+	}
+	return ar.GetAnswer(), nil
+}
+
+// удаление  соментария ,на деле мы небудем удалять а ставтиь метку.
+func (d *RPClient) DelComment(id int64) (bool, error) {
+	client := pb.NewCommentServiceClient(d.client)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.timeout)*time.Second)
+	defer cancel()
+	f := pb.Forlist{Count: uint64(id)}
+	ret, err := client.DelComment(ctx, &f)
+	if err != nil {
+		return false, err
+	}
+	return ret.GetRet() == id, nil
 }

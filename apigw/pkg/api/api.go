@@ -11,6 +11,9 @@ import (
 	"net/http"
 	"strconv"
 
+	pb "gateway/internal/rpc"
+	"sync"
+
 	"github.com/gorilla/mux"
 )
 
@@ -61,9 +64,56 @@ func (api *API) endpoints() {
 	// добавить комментарий
 	api.r.HandleFunc("/comment/{id:[0-9]+}", api.addcomment).Methods(http.MethodPost, http.MethodOptions)
 	// получить комментарий
-	api.r.HandleFunc("/comment/{id:[0-9]+}", api.news).Methods(http.MethodGet, http.MethodOptions)
+	api.r.HandleFunc("/comment/{id:[0-9]+}", api.getcomments).Methods(http.MethodGet, http.MethodOptions)
+	api.r.HandleFunc("/comment/{id:[0-9]+}", api.delcomment).Methods(http.MethodDelete, http.MethodOptions)
 	api.r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./webapp"))))
 	api.r.Use(api.headersMiddleware)
+}
+
+func (api *API) delcomment(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodOptions {
+		return
+	}
+	idcomment := mux.Vars(r)["id"]
+	id, err := strconv.ParseInt(idcomment, 10, 64)
+	if err != nil {
+		http.Error(w, " comment = "+idcomment+"\n"+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	ret, err := api.cClient.DelComment(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//w.Header().Set("Content-Length", fmt.Sprintf("%d", len(jsn)))
+
+	w.Header().Set("result", fmt.Sprintf("%t", ret))
+	w.Header().Set("Endpoint", "delcomments")
+
+}
+
+func (api *API) getcomments(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodOptions {
+		return
+	}
+	idcomment := mux.Vars(r)["id"]
+	id, err := strconv.ParseInt(idcomment, 10, 64)
+	if err != nil {
+		http.Error(w, "number news = "+idcomment+"\n"+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	ret, err := api.cClient.Comments(id)
+	jsn, err := json.Marshal(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(jsn)))
+
+	w.Header().Set("id", idcomment)
+	w.Header().Set("Endpoint", "getcomments")
+	w.Write(jsn)
 }
 
 func (api *API) addcomment(w http.ResponseWriter, r *http.Request) {
@@ -90,7 +140,8 @@ func (api *API) addcomment(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("id", fmt.Sprintf("%d", id))
 	w.Write([]byte("ok"))
-	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Endpoint", "addcomment")
+	//w.WriteHeader(http.StatusOK)
 }
 
 func (api *API) search(w http.ResponseWriter, r *http.Request) {
@@ -111,14 +162,14 @@ func (api *API) search(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	ret, err := json.Marshal(arrayNews.Get())
+	ret, err := json.Marshal(arrayNews)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(ret)))
 	w.Header().Set("Endpoint", "search")
-	w.Header().Set("count", fmt.Sprintf("%d", len(arrayNews.Get())))
+	w.Header().Set("count", fmt.Sprintf("%d", len(arrayNews)))
 	w.Write(ret)
 }
 
@@ -142,7 +193,7 @@ func (api *API) page(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	ret, err := json.Marshal(arrayNews.Get())
+	ret, err := json.Marshal(arrayNews)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -150,7 +201,7 @@ func (api *API) page(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(ret)))
 	w.Header().Set("Page", pageStr)
 	w.Header().Set("limit", fmt.Sprintf("%d", count))
-	w.Header().Set("Count", fmt.Sprintf("%d", len(arrayNews.Get())))
+	w.Header().Set("Count", fmt.Sprintf("%d", len(arrayNews)))
 	w.Header().Set("Endpoint", "page")
 	w.Write(ret)
 }
@@ -171,7 +222,7 @@ func (api *API) news(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	ret, err := json.Marshal(arrayNews.Get())
+	ret, err := json.Marshal(arrayNews)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -192,7 +243,7 @@ func (api *API) list(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	ret, err := json.Marshal(arrayNews.Get())
+	ret, err := json.Marshal(arrayNews)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -213,12 +264,38 @@ func (api *API) detail(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "id = "+idstr+"\n"+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	news, err := api.nClient.DetailNews(id)
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+	var fnews *pb.FullNew = new(pb.FullNew)
+
+	//var comments pb.
+	func() {
+		go func() {
+			news, err := api.nClient.DetailNews(id)
+			if err != nil {
+				wg.Done()
+				return
+			}
+			fnews.News = news
+			wg.Done()
+		}()
+		go func() {
+			ret, err := api.cClient.Comments(int64(id))
+			if err != nil {
+				wg.Done()
+				return
+			}
+			fnews.Commments = ret
+			wg.Done()
+		}()
+	}()
+	wg.Wait()
 	if err != nil {
-		http.Error(w, "id = "+idstr+"\n"+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "\n"+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	ret, err := json.Marshal(news)
+	ret, err := json.Marshal(fnews)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

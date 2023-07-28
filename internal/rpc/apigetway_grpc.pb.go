@@ -299,6 +299,7 @@ var RssService_ServiceDesc = grpc.ServiceDesc{
 
 const (
 	CommentService_AddComment_FullMethodName  = "/rpc_news.CommentService/AddComment"
+	CommentService_DelComment_FullMethodName  = "/rpc_news.CommentService/DelComment"
 	CommentService_TreeComment_FullMethodName = "/rpc_news.CommentService/TreeComment"
 )
 
@@ -308,6 +309,7 @@ const (
 type CommentServiceClient interface {
 	// add comment
 	AddComment(ctx context.Context, in *Comment, opts ...grpc.CallOption) (*Result, error)
+	DelComment(ctx context.Context, in *Forlist, opts ...grpc.CallOption) (*Result, error)
 	// return tree comment for id news
 	TreeComment(ctx context.Context, in *Forlist, opts ...grpc.CallOption) (*TreeComments, error)
 }
@@ -329,6 +331,15 @@ func (c *commentServiceClient) AddComment(ctx context.Context, in *Comment, opts
 	return out, nil
 }
 
+func (c *commentServiceClient) DelComment(ctx context.Context, in *Forlist, opts ...grpc.CallOption) (*Result, error) {
+	out := new(Result)
+	err := c.cc.Invoke(ctx, CommentService_DelComment_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *commentServiceClient) TreeComment(ctx context.Context, in *Forlist, opts ...grpc.CallOption) (*TreeComments, error) {
 	out := new(TreeComments)
 	err := c.cc.Invoke(ctx, CommentService_TreeComment_FullMethodName, in, out, opts...)
@@ -344,6 +355,7 @@ func (c *commentServiceClient) TreeComment(ctx context.Context, in *Forlist, opt
 type CommentServiceServer interface {
 	// add comment
 	AddComment(context.Context, *Comment) (*Result, error)
+	DelComment(context.Context, *Forlist) (*Result, error)
 	// return tree comment for id news
 	TreeComment(context.Context, *Forlist) (*TreeComments, error)
 	mustEmbedUnimplementedCommentServiceServer()
@@ -355,6 +367,9 @@ type UnimplementedCommentServiceServer struct {
 
 func (UnimplementedCommentServiceServer) AddComment(context.Context, *Comment) (*Result, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddComment not implemented")
+}
+func (UnimplementedCommentServiceServer) DelComment(context.Context, *Forlist) (*Result, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelComment not implemented")
 }
 func (UnimplementedCommentServiceServer) TreeComment(context.Context, *Forlist) (*TreeComments, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TreeComment not implemented")
@@ -390,6 +405,24 @@ func _CommentService_AddComment_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CommentService_DelComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Forlist)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommentServiceServer).DelComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommentService_DelComment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommentServiceServer).DelComment(ctx, req.(*Forlist))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CommentService_TreeComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Forlist)
 	if err := dec(in); err != nil {
@@ -418,6 +451,10 @@ var CommentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddComment",
 			Handler:    _CommentService_AddComment_Handler,
+		},
+		{
+			MethodName: "DelComment",
+			Handler:    _CommentService_DelComment_Handler,
 		},
 		{
 			MethodName: "TreeComment",

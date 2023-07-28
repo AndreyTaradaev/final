@@ -42,7 +42,26 @@ func newServer() (*CommentServer, error) {
 
 // добавить комментарий.
 func (s *CommentServer) AddComment(ctx context.Context, c *pb.Comment) (*pb.Result, error) {
-	id,err := s.db.AddComment(c)
+	id, err := s.db.AddComment(c)
+	if err != nil {
+		logs.New().Errorln(err)
+		return nil, err
+	}
+	return &pb.Result{Ret: id}, nil
+}
+
+// добавить комментарий.
+func (s *CommentServer) TreeComment(ctx context.Context, f *pb.Forlist) (*pb.TreeComments, error) {
+	ar, err := s.db.Comments(f)
+	if err != nil {
+		logs.New().Errorln(err)
+		return nil, err
+	}
+	return &pb.TreeComments{Answer: ar}, nil
+}
+
+func (s *CommentServer) DelComment(ctx context.Context, f *pb.Forlist) (*pb.Result, error) {
+	id, err := s.db.DelComment(f)
 	if err != nil {
 		logs.New().Errorln(err)
 		return nil, err

@@ -120,18 +120,18 @@ func (s *ShortNews) Get() []Short {
 // структура коментариев.
 // Структура коментариея для обработки.
 type Comment struct {
-	IdComment int64      `json:"id,omitempty"`
-	Parent    int64      `json:"parent,omitempty"`
-	Content   string     `json:"content"`
-	IdNews    int64      `json:"idnews"`
-	AuthorId  int64      `json:"authorid,omitempty"`
-	Author    string     `json:"author,omitempty"`
-	Time      int64      `json:"time"`
-	Answer    []*Comment `json:"anwser,omitempty"`
+	IdComment *int64             `json:"id,omitempty"`
+	Parent    *int64             `json:"parent,omitempty"`
+	Content   string             `json:"content"`
+	IdNews    int64              `json:"idnews"`
+	AuthorId  int64              `json:"authorid,omitempty"`
+	Author    *string            `json:"author,omitempty"`
+	Time      int64              `json:"time"`
+	Answer    map[int64]*Comment `json:"anwser,omitempty"`
 }
 
 // ctor for comment
-func CreateComment(Id, Par int64, Cont, Aut string, AutId, time int64) *Comment {
+func CreateComment(Id, Par *int64, Cont string, Aut *string, AutId int64, time int64) *Comment {
 	c := new(Comment)
 	c.IdComment = Id
 	c.Parent = Par
@@ -139,6 +139,7 @@ func CreateComment(Id, Par int64, Cont, Aut string, AutId, time int64) *Comment 
 	c.AuthorId = AutId
 	c.Author = Aut
 	c.Time = time
+	c.Answer = make(map[int64]*Comment)
 	return c
 }
 
@@ -149,7 +150,10 @@ type Full struct {
 
 // add child comment
 func (parent *Comment) Add(child ...*Comment) {
-	parent.Answer = append(parent.Answer, child...)
+	for _, v := range child {
+		parent.Answer[*v.IdComment] = v
+
+	}
 }
 
 type FullNew struct {
