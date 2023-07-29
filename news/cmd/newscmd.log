@@ -1,51 +1,5 @@
-time="28-Jul-2023 17:58:33.85" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
-time="28-Jul-2023 17:58:33.88" level=info msg="командная строка  -config e:\\Go\\skilfactory\\module40\\final\\news\\cmd/config.json -debug" func="main.main()" file="newscmd.go:36" app=newscmd
-time="28-Jul-2023 17:58:33.88" level=debug msg=" Параметры конфигурации newsport: 10000, logdir: e:/Go/skilfactory/module40/final/news/cmd " func="main.main()" file="newscmd.go:37" app=newscmd
-time="28-Jul-2023 17:58:33.88" level=debug msg="настрока параметров соединения  сервера" func="main.main()" file="newscmd.go:38" app=newscmd
-time="28-Jul-2023 17:58:34.04" level=debug msg="map[rpc_news.RssService:{[{Search false false} {List false false} {ListPage false false} {GetNews false false} {AddNews true false}] apigetway.proto}]" func="gateway/news/pkg/service.RunServer()" file="service.go:30" app=newscmd
-time="28-Jul-2023 17:59:28.46" level=debug msg="client send command list page" func="gateway/news/pkg/service.(*RssServiceServer).ListPage()" file="service.go:73" app=newscmd
-time="28-Jul-2023 17:59:28.90" level=debug msg="client send command list proccesed count:  20" func="gateway/news/pkg/service.(*RssServiceServer).ListPage()" file="service.go:90" app=newscmd
-time="28-Jul-2023 17:59:55.14" level=debug msg="client send command list" func="gateway/news/pkg/service.(*RssServiceServer).List()" file="service.go:96" app=newscmd
-time="28-Jul-2023 17:59:55.22" level=debug msg="client send command list proccesed count:  50" func="gateway/news/pkg/service.(*RssServiceServer).List()" file="service.go:112" app=newscmd
-time="28-Jul-2023 18:00:05.99" level=debug msg="client send command  full news " func="gateway/news/pkg/service.(*RssServiceServer).GetNews()" file="service.go:119" app=newscmd
-time="28-Jul-2023 18:00:06.08" level=debug msg="client send command full news  proccesed " func="gateway/news/pkg/service.(*RssServiceServer).GetNews()" file="service.go:132" app=newscmd
-time="28-Jul-2023 18:00:28.24" level=debug msg="client send command list" func="gateway/news/pkg/service.(*RssServiceServer).List()" file="service.go:96" app=newscmd
-time="28-Jul-2023 18:00:28.58" level=debug msg="client send command list proccesed count:  1000" func="gateway/news/pkg/service.(*RssServiceServer).List()" file="service.go:112" app=newscmd
-time="28-Jul-2023 18:00:38.19" level=debug msg="client send command search" func="gateway/news/pkg/service.(*RssServiceServer).Search()" file="service.go:139" app=newscmd
-time="28-Jul-2023 18:00:38.19" level=debug msg="SELECT id, title, description, \"time\", url, hashrss\nFROM \"NewsRss\" where \n( $1 ='' or   ( -- поиск по слову\ntitle  NOT ILIKE  '%'||$1||'%' \nor description  NOT ILIKE  '%'||$1||'%'\nor url  NOT ILIKE  '%'||$1||'%'\n))\nand ($2=0 or \"time\" >=$2 )\nand ($3=0 or \"time\" <=$3 )\n order by  \"time\"  DESC \n; " func="gateway/news/pkg/service.(*RssServiceServer).Search()" file="service.go:145" app=newscmd
-time="28-Jul-2023 18:00:38.19" level=debug msg="Parametrs:   go  0 0" func="gateway/news/pkg/service.(*RssServiceServer).Search()" file="service.go:149" app=newscmd
-time="28-Jul-2023 18:00:39.04" level=debug msg="client send command search proccesed count:  1610" func="gateway/news/pkg/service.(*RssServiceServer).Search()" file="service.go:168" app=newscmd
-time="28-Jul-2023 18:09:05.61" level=debug msg="client send  data" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:50" app=newscmd
-time="28-Jul-2023 18:09:05.64" level=debug msg="client send  data" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:50" app=newscmd
-time="28-Jul-2023 18:09:05.95" level=debug msg="client's data has been processed" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:55" app=newscmd
-time="28-Jul-2023 18:09:12.80" level=debug msg="client's data has been processed" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:55" app=newscmd
-time="28-Jul-2023 18:12:05.22" level=debug msg="client send  data" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:50" app=newscmd
-time="28-Jul-2023 18:12:05.53" level=debug msg="client send  data" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:50" app=newscmd
-time="28-Jul-2023 18:12:05.68" level=debug msg="client's data has been processed" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:55" app=newscmd
-time="28-Jul-2023 18:12:12.27" level=debug msg="client's data has been processed" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:55" app=newscmd
-time="28-Jul-2023 18:15:05.14" level=debug msg="client send  data" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:50" app=newscmd
-time="28-Jul-2023 18:15:05.24" level=debug msg="client send  data" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:50" app=newscmd
-time="28-Jul-2023 18:15:05.53" level=debug msg="client send  data" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:50" app=newscmd
-time="28-Jul-2023 18:15:05.83" level=debug msg="client's data has been processed" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:55" app=newscmd
-time="28-Jul-2023 18:15:05.84" level=debug msg="client's data has been processed" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:55" app=newscmd
-time="28-Jul-2023 18:15:12.33" level=debug msg="client's data has been processed" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:55" app=newscmd
-time="28-Jul-2023 18:18:05.14" level=debug msg="client send  data" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:50" app=newscmd
-time="28-Jul-2023 18:18:05.21" level=debug msg="client send  data" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:50" app=newscmd
-time="28-Jul-2023 18:18:05.29" level=debug msg="client send  data" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:50" app=newscmd
-time="28-Jul-2023 18:18:05.55" level=debug msg="client send  data" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:50" app=newscmd
-time="28-Jul-2023 18:18:05.84" level=debug msg="client's data has been processed" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:55" app=newscmd
-time="28-Jul-2023 18:18:05.87" level=debug msg="client's data has been processed" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:55" app=newscmd
-time="28-Jul-2023 18:18:05.91" level=debug msg="client's data has been processed" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:55" app=newscmd
-time="28-Jul-2023 18:18:12.30" level=debug msg="client's data has been processed" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:55" app=newscmd
-time="28-Jul-2023 18:21:05.11" level=debug msg="client send  data" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:50" app=newscmd
-time="28-Jul-2023 18:21:05.14" level=debug msg="client send  data" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:50" app=newscmd
-time="28-Jul-2023 18:21:05.25" level=debug msg="client send  data" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:50" app=newscmd
-time="28-Jul-2023 18:21:05.54" level=debug msg="client send  data" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:50" app=newscmd
-time="28-Jul-2023 18:21:05.68" level=debug msg="client's data has been processed" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:55" app=newscmd
-time="28-Jul-2023 18:21:05.81" level=debug msg="client's data has been processed" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:55" app=newscmd
-time="28-Jul-2023 18:21:05.82" level=debug msg="client's data has been processed" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:55" app=newscmd
-time="28-Jul-2023 18:21:12.29" level=debug msg="client's data has been processed" func="gateway/news/pkg/service.(*RssServiceServer).AddNews()" file="service.go:55" app=newscmd
-time="28-Jul-2023 18:27:40.34" level=debug msg="client send command  full news " func="gateway/news/pkg/service.(*RssServiceServer).GetNews()" file="service.go:119" app=newscmd
-time="28-Jul-2023 18:27:40.40" level=debug msg="client send command full news  proccesed " func="gateway/news/pkg/service.(*RssServiceServer).GetNews()" file="service.go:132" app=newscmd
-time="28-Jul-2023 18:29:16.65" level=debug msg="client send command  full news " func="gateway/news/pkg/service.(*RssServiceServer).GetNews()" file="service.go:119" app=newscmd
-time="28-Jul-2023 18:29:16.68" level=debug msg="client send command full news  proccesed " func="gateway/news/pkg/service.(*RssServiceServer).GetNews()" file="service.go:132" app=newscmd
+time="29-Jul-2023 17:36:26.22" level=info msg="запуск приложения" func="main.main()" file="newscmd.go:35" app=newscmd
+time="29-Jul-2023 17:36:26.30" level=info msg="командная строка  -config e:\\Go\\skilfactory\\module40\\final\\news\\cmd/config.json -debug" func="main.main()" file="newscmd.go:36" app=newscmd
+time="29-Jul-2023 17:36:26.30" level=debug msg=" Параметры конфигурации newsport: 10000, logdir: e:/Go/skilfactory/module40/final/news/cmd " func="main.main()" file="newscmd.go:37" app=newscmd
+time="29-Jul-2023 17:36:26.31" level=debug msg="настрока параметров соединения  сервера" func="main.main()" file="newscmd.go:38" app=newscmd
+time="29-Jul-2023 17:36:26.32" level=fatal msg="failed to listen: listen tcp 127.0.0.1:10000: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted." func="main.main()" file="newscmd.go:41" app=newscmd

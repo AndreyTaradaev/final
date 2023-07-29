@@ -4,11 +4,14 @@ import (
 	"flag"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
 // имя файла конфига.
-const filename string = "config.json"
+const (
+	filename string = "config.json"
+)
 
 // Вспомогательная структура парсинг командной строки.
 type Arg struct {
@@ -75,4 +78,13 @@ func FileNamewithoutExt(path string) string {
 func FileExists(path string) bool {
 	_, err := os.Stat(path)
 	return !os.IsNotExist(err)
+}
+
+// конвертирует строку в число если ошибка возвращает значение по умолчанию.
+func GetIntDef(value string, def int64) int64 {
+	v, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		return def
+	}
+	return v
 }

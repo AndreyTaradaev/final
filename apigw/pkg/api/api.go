@@ -1,10 +1,10 @@
-// API приложения Gateway
+// маршрутизатор для http сервера API приложения Gateway
 package api
 
 import (
 	"encoding/json"
 	"fmt"
-	"gateway/apigw/pkg/rpcclient"
+	"gateway/apigw/pkg/rpc"
 	logs "gateway/internal/log"
 	"gateway/internal/model"
 	"io"
@@ -18,9 +18,9 @@ import (
 )
 
 type API struct {
-	r       *mux.Router
-	nClient model.NewsClient
-	cClient model.CommentClient
+	r *mux.Router
+	newsClient rpc.NewsClient	
+	commentClient rpc.CommentClient
 }
 
 const timeout int = 120

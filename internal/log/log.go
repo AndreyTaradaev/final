@@ -4,46 +4,34 @@ package log
 
 import (
 	"fmt"
+	"gateway/internal/tools"
 	"os"
 	"path"
 	"runtime"
 	"sync"
+
 	"github.com/sirupsen/logrus"
-	"gateway/internal/tools"
 )
-
-/* type Level int 
-
-const (
-Info Level = iota
-Warning
-Error
-Debug
-)
-// для каналов
-type LogChannel struct{
-	ChLevel Level
-	Message string
-}
- */
-
 
 var once sync.Once
 var logger *logrus.Logger
 
-// init setting log 
+func init() {
+	logger = createLogger()
+}
 
+// init setting log.
 func InitConfig(dir string, debug bool) {
-	exename := tools.FileNamewithoutExt(os.Args[0])	
+	exename := tools.FileNamewithoutExt(os.Args[0])
 	tf := logrus.TextFormatter{}
-	tf.TimestampFormat ="02-Jan-2006 15:04:05.00"
-	if len(dir) == 0 { // 
+	tf.TimestampFormat = "02-Jan-2006 15:04:05.00"
+	if len(dir) == 0 { //
 		logger.SetOutput(os.Stdout)
 		tf.ForceColors = true
 		tf.FullTimestamp = true
 
 	} else {
-		f, err := os.OpenFile(dir+"/"+exename +".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0755)
+		f, err := os.OpenFile(dir+"/"+exename+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0755)
 		if err != nil {
 			logger.SetOutput(os.Stdout)
 			tf.ForceColors = true
@@ -51,13 +39,13 @@ func InitConfig(dir string, debug bool) {
 		} else {
 			logger.SetOutput(f)
 			tf.DisableColors = true
-			}
+		}
 	}
 
 	if debug {
 		logger.SetLevel(logrus.DebugLevel)
 		logger.SetReportCaller(true)
-		tf.CallerPrettyfier = func(frame *runtime.Frame) ( string, string) {
+		tf.CallerPrettyfier = func(frame *runtime.Frame) (string, string) {
 			filename := path.Base(frame.File)
 			return fmt.Sprintf("%s()", frame.Function), fmt.Sprintf("%s:%d", filename, frame.Line)
 		}
@@ -68,22 +56,21 @@ func InitConfig(dir string, debug bool) {
 	logger.SetFormatter(&tf)
 }
 
-
-// ctor for log singleton
-func New() *logrus.Entry {
-	exename := tools.FileNamewithoutExt(os.Args[0])		
+func createLogger() *logrus.Logger {
 	once.Do(func() {
 		logger = logrus.New()
-		//initConfig (dir, exename, debug)
 	})
-	
-	return logger.WithField("app",exename )	
+	return logger
 }
 
+// ctor for log singleton.
+func New() *logrus.Entry {
+	exename := tools.FileNamewithoutExt(os.Args[0])
+	ret := createLogger()
+	return ret.WithField("app", exename)
+}
+
+// Close log.
 func Close() {
 	logger.Writer().Close()
 }
-
-//func generateNameFile() string
-
-//var logr  =
