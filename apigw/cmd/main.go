@@ -12,8 +12,6 @@ import (
 	"net/http"
 )
 
-
-
 func main() {
 	//парсим командную строку
 	a, err := tools.ParseFile()

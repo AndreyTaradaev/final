@@ -5,21 +5,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"gateway/apigw/pkg/rpc"
+	"gateway/apigw/pkg/rpc/service"
 	logs "gateway/internal/log"
-	"gateway/internal/model"
+	pb "gateway/internal/model"
 	"io"
 	"net/http"
 	"strconv"
-
-	pb "gateway/internal/rpc"
 	"sync"
 
 	"github.com/gorilla/mux"
 )
 
 type API struct {
-	r *mux.Router
-	newsClient rpc.NewsClient	
+	r             *mux.Router
+	newsClient    rpc.NewsClient
 	commentClient rpc.CommentClient
 }
 
@@ -28,18 +27,18 @@ const timeout int = 120
 // Конструктор API.
 func New(newstr, commentstr string) (*API, error) {
 	logger := logs.New()
-	newsclient, err := rpcclient.Connect(newstr, timeout)
+	newsclient, err := service.Connect(newstr, timeout)
 	if err != nil {
 		return nil, err
 	}
 
-	commentclient, err := rpcclient.Connect(commentstr, timeout)
+	commentclient, err := service.Connect(commentstr, timeout)
 	if err != nil {
 		newsclient.Close()
 		return nil, err
 	}
 
-	a := API{r: mux.NewRouter(), nClient: newsclient, cClient: commentclient}
+	a := API{r: mux.NewRouter(), newsClient: newsclient, cClient: commentclient}
 	a.endpoints()
 	logger.Debug("Init router http")
 	return &a, nil

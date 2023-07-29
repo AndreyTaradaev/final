@@ -14,10 +14,9 @@ type NewsClient interface {
 	Client() *grpc.ClientConn
 	Close() error
 	GetState() connectivity.State
-	AddNews(s *ShortNews) error
-	ListPageNews(Page, limit uint32) ([]*pb.ShortNew, error)
-	ListNews(n uint64) ([]*pb.ShortNew, error)
-	DetailNews(n uint64) (*pb.ShortNew, error)
+	ListPageNews(Page, limit int64) ([]*pb.ShortNew, error)
+	ListNews(n int64) ([]*pb.ShortNew, error)
+	DetailNews(n int64) (*pb.ShortNew, error) 
 	SearchNews(word string, paramword string, fieldsort string, typesort string, startDate string, //начальная дата
 		endDate string) ([]*pb.ShortNew, error)
 }
