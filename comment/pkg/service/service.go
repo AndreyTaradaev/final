@@ -4,7 +4,7 @@ import (
 	"context"
 	"gateway/comment/pkg/storage"
 	logs "gateway/internal/log"
-	pb "gateway/internal/rpc"
+	pb "gateway/internal/model"
 	"net"
 
 	"google.golang.org/grpc"

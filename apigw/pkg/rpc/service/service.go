@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	logs "gateway/internal/log"
-	"gateway/internal/model"
 	pb "gateway/internal/model"
 	"gateway/internal/tools"
 	"time"
@@ -174,7 +173,7 @@ func (d *RPClient) SearchNews(word string, // слово для поиска
 }
 
 // Добавление коментария
-func (d *RPClient) AddComment(c *model.Comment) (int64, error) {
+func (d *RPClient) AddComment(c *pb.Comment) (int64, error) {
 
 	client := pb.NewCommentServiceClient(d.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.timeout)*time.Second)

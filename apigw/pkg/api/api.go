@@ -38,7 +38,7 @@ func New(newstr, commentstr string) (*API, error) {
 		return nil, err
 	}
 
-	a := API{r: mux.NewRouter(), newsClient: newsclient, cClient: commentclient}
+	a := API{r: mux.NewRouter(), newsClient: newsclient, commentClient: commentclient}
 	a.endpoints()
 	logger.Debug("Init router http")
 	return &a, nil
