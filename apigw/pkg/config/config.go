@@ -156,10 +156,11 @@ func (c *config) Load(file string) error {
 		}
 		file = filepath.Dir(exe) + "/" + tools.FileConfig()
 	}
-
 	b, err := ioutil.ReadFile(file)
 	if err == nil {
 		json.Unmarshal(b, &c.conf)
+	} else {
+		fmt.Println(err)
 	}
 	// from env
 	c.loadFromEnv()

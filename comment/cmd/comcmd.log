@@ -1,5 +1,5 @@
-time="29-Jul-2023 17:36:26.04" level=info msg="запуск приложения" func="main.main()" file="comcmd.go:36" app=comcmd
-time="29-Jul-2023 17:36:26.09" level=info msg="командная строка  -config e:\\Go\\skilfactory\\module40\\final\\comment\\cmd/config.json -debug" func="main.main()" file="comcmd.go:37" app=comcmd
-time="29-Jul-2023 17:36:26.09" level=debug msg=" Параметры конфигурации commentport: 10001, logdir: ./ " func="main.main()" file="comcmd.go:38" app=comcmd
-time="29-Jul-2023 17:36:26.09" level=debug msg="настрока параметров соединения  сервера" func="main.main()" file="comcmd.go:39" app=comcmd
-time="29-Jul-2023 17:36:26.23" level=debug msg="map[rpc_news.CommentService:{[{AddComment false false} {DelComment false false} {TreeComment false false}] apigetway.proto}]" func="gateway/comment/pkg/service.RunServer()" file="service.go:28" app=comcmd
+time="30-Jul-2023 13:17:29.34" level=info msg="запуск приложения" func="main.main()" file="comcmd.go:36" app=comcmd
+time="30-Jul-2023 13:17:29.38" level=info msg="командная строка  -config e:\\Go\\skilfactory\\module40\\final\\comment\\cmd/config.json -debug" func="main.main()" file="comcmd.go:37" app=comcmd
+time="30-Jul-2023 13:17:29.38" level=debug msg=" Параметры конфигурации commentport: 10001, logdir: ./ " func="main.main()" file="comcmd.go:38" app=comcmd
+time="30-Jul-2023 13:17:29.38" level=debug msg="настрока параметров соединения  сервера" func="main.main()" file="comcmd.go:39" app=comcmd
+time="30-Jul-2023 13:17:29.58" level=debug msg="map[rpc_news.CommentService:{[{AddComment false false} {DelComment false false} {TreeComment false false}] apigetway.proto}]" func="gateway/comment/pkg/service.RunServer()" file="service.go:29" app=comcmd

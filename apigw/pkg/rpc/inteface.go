@@ -16,8 +16,7 @@ type NewsClient interface {
 	ListPageNews(Page, limit int64) ([]*pb.ShortNew, error)
 	ListNews(n int64) ([]*pb.ShortNew, error)
 	DetailNews(n int64) (*pb.ShortNew, error)
-	SearchNews(word string, paramword string, fieldsort string, typesort string, startDate string, //начальная дата
-		endDate string) ([]*pb.ShortNew, error)
+	SearchNews(filter *pb.Filter) ([]*pb.ShortNew, error)
 }
 
 type CommentClient interface {

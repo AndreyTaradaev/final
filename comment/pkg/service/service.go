@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"gateway/comment/pkg/storage"
+	"gateway/comment/pkg/storage/postgres"
 	logs "gateway/internal/log"
 	pb "gateway/internal/model"
 	"net"
@@ -12,7 +13,7 @@ import (
 
 type CommentServer struct {
 	pb.CommentServiceServer
-	db *storage.DB
+	db storage.DBInterface
 }
 
 // запуск микросервиса коментариев.
@@ -32,7 +33,8 @@ func RunServer(lis *net.Listener) error {
 
 // конструктор RPC сервера.
 func newServer() (*CommentServer, error) {
-	db, err := storage.New()
+	db, err := postgres.New()
+
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +59,7 @@ func (s *CommentServer) TreeComment(ctx context.Context, f *pb.Forlist) (*pb.Tre
 		logs.New().Errorln(err)
 		return nil, err
 	}
-	return &pb.TreeComments{Answer: ar}, nil
+	return ar, nil
 }
 
 func (s *CommentServer) DelComment(ctx context.Context, f *pb.Forlist) (*pb.Result, error) {

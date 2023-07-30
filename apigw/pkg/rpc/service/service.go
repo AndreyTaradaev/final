@@ -6,7 +6,6 @@ import (
 	"fmt"
 	logs "gateway/internal/log"
 	pb "gateway/internal/model"
-	"gateway/internal/tools"
 	"time"
 
 	"google.golang.org/grpc"
@@ -50,8 +49,7 @@ func ConnectWithContext(target string, time_out int) (*RPClient, error) {
 		return nil, fmt.Errorf("server RPC is emply")
 	}
 	ret := RPClient{timeout: time_out}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(ret.timeout))
-	defer cancel()
+	ctx, _ := context.WithTimeout(context.Background(), time.Second*time.Duration(ret.timeout))
 	client, err := grpc.DialContext(ctx, target, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
 		return nil, err
@@ -144,28 +142,12 @@ func (d *RPClient) DetailNews(n int64) (*pb.ShortNew, error) {
 }
 
 // поиск по фильтру
-func (d *RPClient) SearchNews(word string, // слово для поиска
-	paramword string, // параметр для поиска
-	fieldsort string, //поле для сортировки
-	typesort string, //тип сортировки
-	startDate string, //начальная дата
-	endDate string) ([]*pb.ShortNew, error) {
-	//формируем структуру фильтра поиска
-	pbFilter := pb.Filter{
-		Word: &pb.FindWord{
-			Search: word,
-			Option: pb.WordParam(paramword)},
-		Sort: &pb.OptionSort{
-			Field: pb.FieldSort(fieldsort),
-			Sort:  pb.TypeSort(typesort)},
-		Period: &pb.FilterDate{
-			Startdate: tools.GetIntDef(startDate, 0),
-			Enddate:   tools.GetIntDef(endDate, 0)},
-	}
+func (d *RPClient) SearchNews(filter *pb.Filter) ([]*pb.ShortNew, error) {
+
 	client := pb.NewRssServiceClient(d.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.timeout)*time.Second)
 	defer cancel()
-	array, err := client.Search(ctx, &pbFilter)
+	array, err := client.Search(ctx, filter)
 	if err != nil {
 		return nil, err
 	}

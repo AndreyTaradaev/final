@@ -1,0 +1,16 @@
+time="30-Jul-2023 13:15:17.71" level=info msg="config loaded, start program...." app=apicmd
+time="30-Jul-2023 13:15:17.74" level=info msg="cmdline:  -config E:\\Go\\skilfactory\\module40\\final\\apigw\\cmd/config.json" app=apicmd
+time="30-Jul-2023 13:15:17.74" level=info msg="Start thread dowload rss" app=apicmd
+time="30-Jul-2023 13:15:17.74" level=info msg="Init Http router" app=apicmd
+time="30-Jul-2023 13:15:17.74" level=info msg="запуск потока загрузки новостей" app=apicmd
+time="30-Jul-2023 13:15:17.74" level=info msg="Init Http server" app=apicmd
+time="30-Jul-2023 13:17:08.66" level=info msg="config loaded, start program...." app=apicmd
+time="30-Jul-2023 13:17:08.68" level=info msg="cmdline:  -config E:\\Go\\skilfactory\\module40\\final\\apigw\\cmd/config.json" app=apicmd
+time="30-Jul-2023 13:17:08.68" level=info msg="Start thread dowload rss" app=apicmd
+time="30-Jul-2023 13:17:08.68" level=info msg="Init Http router" app=apicmd
+time="30-Jul-2023 13:17:08.68" level=info msg="запуск потока загрузки новостей" app=apicmd
+time="30-Jul-2023 13:17:08.69" level=info msg="Init Http server" app=apicmd
+time="30-Jul-2023 13:20:09.47" level=error msg="urls: http://inosmi.ru/misc/export/xml/rss/translation.xml, expected element type <feed> but have <html>" app=apicmd
+time="30-Jul-2023 13:20:09.93" level=error msg="urls: http://news.google.ru/news?ned=ru_ru&topic=t&output=atom, Get \"https://news.google.com/atom?topic=t&hl=ru&gl=RU&ceid=RU:ru\": read tcp 192.168.0.53:17422->142.250.74.174:443: wsarecv: An existing connection was forcibly closed by the remote host." app=apicmd
+time="30-Jul-2023 13:23:09.93" level=error msg="urls: http://inosmi.ru/misc/export/xml/rss/translation.xml, expected element type <feed> but have <html>" app=apicmd
+time="30-Jul-2023 13:23:10.18" level=error msg="urls: http://news.google.ru/news?ned=ru_ru&topic=t&output=atom, Get \"https://news.google.com/atom?topic=t&hl=ru&gl=RU&ceid=RU:ru\": read tcp 192.168.0.53:17724->142.250.74.174:443: wsarecv: An existing connection was forcibly closed by the remote host." app=apicmd

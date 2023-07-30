@@ -5,10 +5,10 @@ import (
 	"gateway/apigw/pkg/rpc/service"
 	logs "gateway/internal/log"
 	pb "gateway/internal/model"
-
 	"time"
 
 	"github.com/SlyMarbo/rss"
+	tags "github.com/grokify/html-strip-tags-go"
 )
 
 // создает  цикл периодически загружает новости из массива urls в отдельных потоках.
@@ -45,7 +45,7 @@ func LoadNews(rpctarget string, urls []string, sec int) {
 				logger.Error("Error create connect", err)
 				continue
 			}
-
+			defer c.Close()
 			for _, v := range urls {
 				go f(c, v)
 			}
@@ -65,7 +65,7 @@ func createClient(target string) (rpc.LoadClient, error) {
 // отправка новостей на сервис, передача по RPC
 func writeNews(client rpc.LoadClient, news *pb.ArrayShortNews) error {
 	//создаем  клиента RPC
-	defer client.Close()
+
 	//отправляем массив новостей на сервер
 	err := client.AddNews(news)
 	if err != nil {
@@ -80,13 +80,11 @@ func loadRss(u string) (*pb.ArrayShortNews, error) {
 	if err != nil {
 		return nil, err
 	}
-	arraynews := new(pb.ArrayShortNews)
-	Array := make([]*pb.ShortNew, 0)
+	a := pb.ArrayShortNews{Array: make([]*pb.ShortNew, 0)}
 
 	for _, v := range feed.Items {
-		n := pb.NewShort(0, v.Title, v.Content, v.Date.Unix(), v.Link, v.ID)
-		Array = append(Array, n)
+		n := pb.NewShort(0, v.Title, tags.StripTags(v.Summary), v.Date.Unix(), v.Link, v.ID)
+		a.Array = append(a.Array, n)
 	}
-	arraynews.Array = Array
-	return arraynews, nil
+	return &a, nil
 }

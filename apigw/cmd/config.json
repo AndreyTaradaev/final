@@ -2,11 +2,14 @@
    "rss":[
       "https://habr.com/ru/rss/hub/go/all/?fl=ru",
       "https://habr.com/ru/rss/best/daily/?fl=ru",
-      "https://cprss.s3.amazonaws.com/golangweekly.com.xml",
-	  "https://lenta.ru/rss"
+      "https://cprss.s3.amazonaws.com/golangweekly.com.xml",	  
+	  "http://www.bashorg.org/rss.xml",
+	  "http://www.kommersant.ru/RSS/main.xml",
+	  "http://news.google.ru/news?ned=ru_ru&topic=t&output=atom",
+	  "http://inosmi.ru/misc/export/xml/rss/translation.xml"
    ],
    "request_period": 180,   	
-	  "newsport" : 10000,    
+	  "newsport" : 12000,    
 	"commentport": 10001,
 	"port" : 80,
 	"logdir": "e:/Go/skilfactory/module40/final/apigw/cmd"

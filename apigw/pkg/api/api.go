@@ -8,6 +8,7 @@ import (
 	"gateway/apigw/pkg/rpc/service"
 	logs "gateway/internal/log"
 	pb "gateway/internal/model"
+	"gateway/internal/tools"
 	"io"
 	"net/http"
 	"strconv"
@@ -79,17 +80,13 @@ func (api *API) delcomment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, " comment = "+idcomment+"\n"+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	ret, err := api.cClient.DelComment(id)
+	ret, err := api.commentClient.DelComment(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	//w.Header().Set("Content-Length", fmt.Sprintf("%d", len(jsn)))
-
 	w.Header().Set("result", fmt.Sprintf("%t", ret))
 	w.Header().Set("Endpoint", "delcomments")
-
 }
 
 func (api *API) getcomments(w http.ResponseWriter, r *http.Request) {
@@ -99,17 +96,16 @@ func (api *API) getcomments(w http.ResponseWriter, r *http.Request) {
 	idcomment := mux.Vars(r)["id"]
 	id, err := strconv.ParseInt(idcomment, 10, 64)
 	if err != nil {
-		http.Error(w, "number news = "+idcomment+"\n"+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "news = "+idcomment+"\n"+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	ret, err := api.cClient.Comments(id)
+	ret, err := api.commentClient.Comments(id)
 	jsn, err := json.Marshal(ret)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(jsn)))
-
 	w.Header().Set("id", idcomment)
 	w.Header().Set("Endpoint", "getcomments")
 	w.Write(jsn)
@@ -120,27 +116,26 @@ func (api *API) addcomment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer r.Body.Close()
-
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	var strucBody model.Comment //
+	var strucBody pb.Comment
 
 	err = json.Unmarshal(b, &strucBody)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	id, err := api.cClient.AddComment(&strucBody)
+	id, err := api.commentClient.AddComment(&strucBody)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	w.Header().Set("id", fmt.Sprintf("%d", id))
 	w.Write([]byte("ok"))
 	w.Header().Set("Endpoint", "addcomment")
-	//w.WriteHeader(http.StatusOK)
 }
 
 func (api *API) search(w http.ResponseWriter, r *http.Request) {
@@ -148,15 +143,15 @@ func (api *API) search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//sort=date&direction=desc&count=10&offset=0
-	word := r.URL.Query().Get("word")
+	word := r.URL.Query().Get("word") //слово поиска
 	typesearch := r.URL.Query().Get("type")
 	sort := r.URL.Query().Get("sort")
 	direction := r.URL.Query().Get("direction")
 	startdate := r.URL.Query().Get("startdate")
 	enddate := r.URL.Query().Get("enddate")
-	logs.New().Debugf(`Parametr search: word "%s", type "%s", field "%s",direction "%s",startdate "%s", enddate "%s"`, word, typesearch, sort, direction, startdate, enddate)
-
-	arrayNews, err := api.nClient.SearchNews(word, typesearch, sort, direction, startdate, enddate)
+	filter := pb.CreateFilter(word, typesearch, sort, direction, startdate, enddate)
+	logs.New().Debugf("argument %s,%s,%s,%s,%s,%s ", word, typesearch, sort, direction, startdate, enddate)
+	arrayNews, err := api.newsClient.SearchNews(filter)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -180,14 +175,9 @@ func (api *API) page(w http.ResponseWriter, r *http.Request) {
 	//logger := logs.New()
 	pageStr := mux.Vars(r)["id"]
 	countStr := r.URL.Query().Get("count")
-	page, err := strconv.ParseUint(pageStr, 10, 64)
-	if err != nil {
-		http.Error(w, "page = "+pageStr+"\n"+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	count := model.GetIntDef(countStr, 20)
-
-	arrayNews, err := api.nClient.ListPageNews(uint32(page), uint32(count))
+	page := tools.GetIntDef(pageStr, 1)
+	count := tools.GetIntDef(countStr, 20)
+	arrayNews, err := api.newsClient.ListPageNews(page, count)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -200,7 +190,7 @@ func (api *API) page(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(ret)))
 	w.Header().Set("Page", pageStr)
 	w.Header().Set("limit", fmt.Sprintf("%d", count))
-	w.Header().Set("Count", fmt.Sprintf("%d", len(arrayNews)))
+	w.Header().Set("CountMews", fmt.Sprintf("%d", len(arrayNews)))
 	w.Header().Set("Endpoint", "page")
 	w.Write(ret)
 }
@@ -211,16 +201,9 @@ func (api *API) news(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	pageStr := mux.Vars(r)["id"]
-	P, err := strconv.ParseUint(pageStr, 10, 64)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	arrayNews, err := api.nClient.ListNews(P)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	P := tools.GetIntDef(pageStr, 10)
+	arrayNews, err := api.newsClient.ListNews(P)
+
 	ret, err := json.Marshal(arrayNews)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -237,7 +220,7 @@ func (api *API) list(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodOptions {
 		return
 	}
-	arrayNews, err := api.nClient.ListNews(1000) // последнюю 1000 новостей
+	arrayNews, err := api.newsClient.ListNews(1000) // последнюю 1000 новостей
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -252,49 +235,57 @@ func (api *API) list(w http.ResponseWriter, r *http.Request) {
 	w.Write(ret)
 }
 
+func (a *API) getDetailNews(id int64) (*pb.FullNew, []error) {
+	var wg sync.WaitGroup
+	var fullnews *pb.FullNew = new(pb.FullNew)
+	wg.Add(2)
+	arrayerror := make([]error, 0)
+
+	go func() {
+		news, err := a.newsClient.DetailNews(id)
+		if err != nil {
+			arrayerror = append(arrayerror, err)
+		} else {
+			fullnews.News = news
+		}
+		wg.Done()
+	}()
+	go func() {
+		ret, err := a.commentClient.Comments(id)
+		if err != nil {
+			arrayerror = append(arrayerror, err)
+		} else {
+			fullnews.Commments = ret
+		}
+		wg.Done()
+	}()
+	wg.Wait()
+	return fullnews, arrayerror
+}
+
 // обработчик  детальная новость
 func (api *API) detail(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodOptions {
 		return
 	}
 	idstr := mux.Vars(r)["id"]
-	id, err := strconv.ParseUint(idstr, 10, 64)
+	id, err := strconv.ParseInt(idstr, 10, 64)
 	if err != nil {
 		http.Error(w, "id = "+idstr+"\n"+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	var wg sync.WaitGroup
-	wg.Add(2)
-	var fnews *pb.FullNew = new(pb.FullNew)
+	fullnews, errs := api.getDetailNews(id)
 
-	//var comments pb.
-	func() {
-		go func() {
-			news, err := api.nClient.DetailNews(id)
-			if err != nil {
-				wg.Done()
-				return
-			}
-			fnews.News = news
-			wg.Done()
-		}()
-		go func() {
-			ret, err := api.cClient.Comments(int64(id))
-			if err != nil {
-				wg.Done()
-				return
-			}
-			fnews.Commments = ret
-			wg.Done()
-		}()
-	}()
-	wg.Wait()
-	if err != nil {
-		http.Error(w, "\n"+err.Error(), http.StatusInternalServerError)
+	if len(errs) != 0 {
+		var out string = ""
+		for _, err := range errs {
+			out += err.Error() + "\n"
+		}
+		http.Error(w, "id news have next error: \n"+out, http.StatusInternalServerError)
 		return
 	}
-	ret, err := json.Marshal(fnews)
+	ret, err := json.Marshal(fullnews)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

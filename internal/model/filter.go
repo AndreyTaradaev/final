@@ -11,7 +11,7 @@ import (
 // 1 часть слова
 // 2 не включает слово
 // 3 не включает часть слова
-func WordParam(Param string /* число в виде строки*/) OptionSearch {
+func wordParam(Param string /* число в виде строки*/) OptionSearch {
 
 	ParamInt := tools.GetIntDef(Param, 1)
 	switch ParamInt {
@@ -28,16 +28,16 @@ func WordParam(Param string /* число в виде строки*/) OptionSear
 }
 
 // возвращает вид сортировки .
-func TypeSort(typesort string) OrderSORT {
+func typeSort(typesort string) OrderSORT {
 
-	if strings.EqualFold(typesort, "asc") {
+	if strings.EqualFold(strings.TrimSpace(typesort), "asc") {
 		return OrderSORT_SORT_ASC
 	}
 	return OrderSORT_SORT_DESC
 }
 
 // возвращает поле сортировки.
-func FieldSort(sort string) FIELD_SORT {
+func fieldSort(sort string) FIELD_SORT {
 	lowersort := strings.ToLower(sort)
 	switch lowersort {
 	case "id":
@@ -52,4 +52,19 @@ func FieldSort(sort string) FIELD_SORT {
 		return FIELD_SORT_FIELD_URL
 	}
 	return FIELD_SORT_FIELD_DATE
+}
+
+// создает структуру фильтра
+func CreateFilter(word string, // слово для поиска
+	paramword string, // параметр для поиска
+	fieldsort string, //поле для сортировки
+	typesort string, //тип сортировки
+	startDate string, //начальная дата
+	endDate string) *Filter {
+	filter := Filter{
+		Word:   &FindWord{Search: word, Option: wordParam(paramword)},
+		Sort:   &OptionSort{Field: fieldSort(fieldsort), Sort: typeSort(typesort)},
+		Period: &FilterDate{Startdate: tools.GetIntDef(startDate, 0), Enddate: tools.GetIntDef(endDate, 0)},
+	}
+	return &filter
 }
