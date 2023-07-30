@@ -41,6 +41,7 @@ func New(newstr, commentstr string) (*API, error) {
 
 	a := API{r: mux.NewRouter(), newsClient: newsclient, commentClient: commentclient}
 	a.endpoints()
+
 	logger.Debug("Init router http")
 	return &a, nil
 }
@@ -235,32 +236,57 @@ func (api *API) list(w http.ResponseWriter, r *http.Request) {
 	w.Write(ret)
 }
 
-func (a *API) getDetailNews(id int64) (*pb.FullNew, []error) {
-	var wg sync.WaitGroup
-	var fullnews *pb.FullNew = new(pb.FullNew)
-	wg.Add(2)
-	arrayerror := make([]error, 0)
+func (a *API) getnews(id int64, channel chan<- interface{}) {
+	news, err := a.newsClient.DetailNews(id)
+	if err != nil {
+		channel <- err
+		return
+	}
+	channel <- news
+}
 
-	go func() {
-		news, err := a.newsClient.DetailNews(id)
-		if err != nil {
-			arrayerror = append(arrayerror, err)
-		} else {
-			fullnews.News = news
+func (a *API) getComment(id int64, channel chan<- interface{}) {
+
+	ret, err := a.commentClient.Comments(id)
+	if err != nil {
+		channel <- err
+		return
+	}
+	channel <- ret
+}
+func receive(channel <-chan interface{}) (*pb.FullNew, error) {
+
+	ret := pb.FullNew{}
+	for a := range channel {
+		switch a.(type) {
+		case error:
+			return nil, a.(error)
+		case *pb.ShortNew:
+			ret.News = a.(*pb.ShortNew)
+		case map[int64]*pb.Comment:
+			ret.Commments = a.(map[int64]*pb.Comment)
 		}
+	}
+	return &ret, nil
+}
+
+func (a *API) formFullNews(id int64) (*pb.FullNew, error) {
+	channel := make(chan interface{}, 2)
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go func() {
+		a.getnews(id, channel)
 		wg.Done()
 	}()
+
 	go func() {
-		ret, err := a.commentClient.Comments(id)
-		if err != nil {
-			arrayerror = append(arrayerror, err)
-		} else {
-			fullnews.Commments = ret
-		}
+		a.getComment(id, channel)
 		wg.Done()
 	}()
 	wg.Wait()
-	return fullnews, arrayerror
+	close(channel)
+	return receive(channel)
 }
 
 // обработчик  детальная новость
@@ -275,14 +301,9 @@ func (api *API) detail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fullnews, errs := api.getDetailNews(id)
-
-	if len(errs) != 0 {
-		var out string = ""
-		for _, err := range errs {
-			out += err.Error() + "\n"
-		}
-		http.Error(w, "id news have next error: \n"+out, http.StatusInternalServerError)
+	fullnews, err := api.formFullNews(id)
+	if err != nil {
+		http.Error(w, "id news have next error: \n"+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	ret, err := json.Marshal(fullnews)

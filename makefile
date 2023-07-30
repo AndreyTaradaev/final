@@ -44,7 +44,7 @@ install: ${SOURCE_GATE}/${BINARY_NAME_GW}  ${SOURCE_NEWS}/${BINARY_NAME_NEWS}  $
 #	start /d   ./${BINARY_DIR}/gw  apicmd.exe -debug
 
 uninstall: 
-	rm -f ${BINARY_DIR}/gw/*
+	rm -f ${BINARY_DIR}/gw/* 
 	rm -f ${BINARY_DIR}/news/*
 	rm -f ${BINARY_DIR}/comment/* 
 	
