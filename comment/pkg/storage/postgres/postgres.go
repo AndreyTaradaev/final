@@ -20,7 +20,7 @@ const (
 		from gocomments.public.newscomments com1 
 		where parent is null and not  banned and id_news=$1 
 		union all 
-		select com2.id, com2.parent,com2.id_news,com2."Content"  , com2."time",com2."authorId" ,cast (temp1.path||'.'||com2.id as varchar(50)),level+1 
+		select  com2.id, com2.parent,com2.id_news,com2."Content"  , com2."time",com2."authorId" ,cast (temp1.path||'.'||com2.id as varchar(50)),level+1
 		from gocomments.public.newscomments com2 inner join temp1 on (temp1.id = com2.parent  and not com2.banned ))
 		select * from temp1
 		order by level,path;	 	

@@ -6,7 +6,8 @@
 	  "http://www.bashorg.org/rss.xml",
 	  "http://www.kommersant.ru/RSS/main.xml",
 	  "http://news.google.ru/news?ned=ru_ru&topic=t&output=atom",
-	  "http://inosmi.ru/misc/export/xml/rss/translation.xml"
+	  "http://inosmi.ru/misc/export/xml/rss/translation.xml",
+      "https://lenta.ru/rss"
    ],
    "request_period": 180,   	
 	  "newsport" : 12000,    

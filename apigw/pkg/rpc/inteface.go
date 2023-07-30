@@ -13,10 +13,10 @@ type NewsClient interface {
 	Client() *grpc.ClientConn
 	Close() error
 	GetState() connectivity.State
-	ListPageNews(Page, limit int64) ([]*pb.ShortNew, error)
-	ListNews(n int64) ([]*pb.ShortNew, error)
+	ListPageNews(Page, limit int64) (*pb.ArrayShortNews, error)
+	ListNews(n int64) (*pb.ArrayShortNews, error)
 	DetailNews(n int64) (*pb.ShortNew, error)
-	SearchNews(filter *pb.Filter) ([]*pb.ShortNew, error)
+	SearchNews(filter *pb.Filter) (*pb.ArrayShortNews, error)
 }
 
 type CommentClient interface {

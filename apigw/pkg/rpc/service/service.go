@@ -100,7 +100,7 @@ func (d *RPClient) AddNews(s *pb.ArrayShortNews) error {
 
 // получение списка новостей по RPC
 // вернуть  список новостей на странице
-func (d *RPClient) ListPageNews(Page, limit int64) ([]*pb.ShortNew, error) {
+func (d *RPClient) ListPageNews(Page, limit int64) (*pb.ArrayShortNews, error) {
 
 	client := pb.NewRssServiceClient(d.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.timeout)*time.Second)
@@ -111,11 +111,11 @@ func (d *RPClient) ListPageNews(Page, limit int64) ([]*pb.ShortNew, error) {
 		return nil, err
 	}
 
-	return array.GetArray(), nil
+	return array, nil
 }
 
 // вернуть список последних новостей  для веб-интефейса
-func (d *RPClient) ListNews(n int64) ([]*pb.ShortNew, error) {
+func (d *RPClient) ListNews(n int64) (*pb.ArrayShortNews, error) {
 
 	client := pb.NewRssServiceClient(d.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.timeout)*time.Second)
@@ -125,7 +125,7 @@ func (d *RPClient) ListNews(n int64) ([]*pb.ShortNew, error) {
 	if err != nil {
 		return nil, err
 	}
-	return array.GetArray(), nil
+	return array, nil
 }
 
 // детальная новость
@@ -142,7 +142,7 @@ func (d *RPClient) DetailNews(n int64) (*pb.ShortNew, error) {
 }
 
 // поиск по фильтру
-func (d *RPClient) SearchNews(filter *pb.Filter) ([]*pb.ShortNew, error) {
+func (d *RPClient) SearchNews(filter *pb.Filter) (*pb.ArrayShortNews, error) {
 
 	client := pb.NewRssServiceClient(d.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.timeout)*time.Second)
@@ -151,7 +151,7 @@ func (d *RPClient) SearchNews(filter *pb.Filter) ([]*pb.ShortNew, error) {
 	if err != nil {
 		return nil, err
 	}
-	return array.GetArray(), nil
+	return array, nil
 }
 
 // Добавление коментария

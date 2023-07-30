@@ -6,12 +6,14 @@ import (
 	"errors"
 	"fmt"
 	pb "gateway/internal/model"
+	"math"
 	"os"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 const Limit int64 = 20
+const Max = math.MaxInt64
 const (
 	addSQL  string = `INSERT INTO "NewsRss" (title, description, "time", url, hashrss) VALUES($1, $2, $3, $4,$5)	ON CONFLICT DO nothing;	`
 	listSQL string = `
@@ -38,11 +40,11 @@ const (
 	 url , hashrss
 	from i
 	)
-	select * from ii;
+	select  %s  from ii;
 `
 	getNews string = `SELECT id, title, description, "time", url, hashrss
 FROM "NewsRss" where id = $1;`
-	searchSql string = `SELECT id, title, description, "time", url, hashrss
+	searchSql string = `SELECT id, title, description, "time", url, hashrss 
 FROM "NewsRss" where 
 ( $1 ='' or   ( -- поиск по слову
 title %s '%%'||$1||'%%' 
@@ -51,9 +53,24 @@ or url %s '%%'||$1||'%%'
 ))
 and ($2=0 or "time" >=$2 )
 and ($3=0 or "time" <=$3 )
-%s
-; `
+%s  ;`
+	countsearchSql = ` with t as ( SELECT  *
+	FROM "NewsRss" where
+	( $1 ='' or   ( -- поиск по слову
+		title %s '%%'||$1||'%%' 
+		or description %s '%%'||$1||'%%'
+		or url %s '%%'||$1||'%%'
+		))
+	and ($2=0 or "time" >=$2 )
+	and ($3=0 or "time" <=$3 )
+	%s  )
+	select count(*) from t 
+	;`
+	row   = `  id, title, description, "time", url, hashrss  `
+	count = " count(*) "
 )
+
+const page = 20
 
 // объект для работы с  База данных новостей.
 type DB struct {
@@ -126,8 +143,21 @@ func createNews(id *int64, title, desc *string, time *int64, url *string, hash *
 
 // вернуть список последних новостей  для веб-интефейса. сокращенно.
 func (db *DB) List(n int64) (*pb.ArrayShortNews, error) {
+	var id int64
+	ret := pb.ArrayShortNews{Array: make([]*pb.ShortNew, 0)}
+	lsql := fmt.Sprintf(listSQL, count)
 
-	rows, err := db.pool.Query(context.Background(), listSQL,
+	err := db.pool.QueryRow(context.Background(), lsql,
+		Max,
+		0,   // c первой новости
+		n-1, // сокращенно
+	).Scan(&id)
+	if err != nil {
+		return nil, err
+	}
+	ret.CountPage = id/n + 1
+	lsql = fmt.Sprintf(listSQL, row)
+	rows, err := db.pool.Query(context.Background(), lsql,
 		n,
 		0,   // c первой новости
 		n-1, // сокращенно
@@ -135,7 +165,7 @@ func (db *DB) List(n int64) (*pb.ArrayShortNews, error) {
 	if err != nil {
 		return nil, err
 	}
-	ret := pb.ArrayShortNews{Array: make([]*pb.ShortNew, 0)}
+
 	for rows.Next() {
 		var id, time, hash *int64
 		var title, desc, url *string
@@ -169,7 +199,21 @@ func (db *DB) ListPage(limit, Page int64) (*pb.ArrayShortNews, error) {
 		Page--
 	}
 	offset := Page * limit
-	rows, err := db.pool.Query(context.Background(), listSQL,
+	var id int64
+	ret := pb.ArrayShortNews{Array: make([]*pb.ShortNew, 0)}
+	lsql := fmt.Sprintf(listSQL, count)
+	err := db.pool.QueryRow(context.Background(), lsql,
+		Max,
+		offset,  // c первой новости
+		limit-1, // сокращенно
+	).Scan(&id)
+	if err != nil {
+		return nil, err
+	}
+	ret.CountPage = id/limit + 1
+	lsql = fmt.Sprintf(listSQL, row)
+
+	rows, err := db.pool.Query(context.Background(), lsql,
 		limit,
 		offset,  // c первой новости
 		limit-1, // сокращенно
@@ -177,7 +221,6 @@ func (db *DB) ListPage(limit, Page int64) (*pb.ArrayShortNews, error) {
 	if err != nil {
 		return nil, err
 	}
-	ret := pb.ArrayShortNews{Array: make([]*pb.ShortNew, 0)}
 	for rows.Next() {
 		var id, time, hash *int64
 		var title, desc, url *string
@@ -223,11 +266,26 @@ func (db *DB) GetNews(i int64) (*pb.ShortNew, error) {
 // получение новостей по Фильтру.
 func (db *DB) Search(f *pb.Filter) (*pb.ArrayShortNews, error) {
 
-	sql, err := formatSQl(f)
+	sql, err := formatSQl(f, countsearchSql)
 	if err != nil {
 		return nil, err
 	}
+
 	wordsearch := FormatWord(f.GetWord())
+
+	var id int64
+	ret := pb.ArrayShortNews{Array: make([]*pb.ShortNew, 0)}
+
+	err = db.pool.QueryRow(context.Background(), sql,
+		wordsearch,
+		f.Period.GetStartdate(),
+		f.GetPeriod().GetEnddate(),
+	).Scan(&id)
+	if err != nil {
+		return nil, err
+	}
+	ret.CountPage = id/page + 1
+	sql, err = formatSQl(f, searchSql)
 
 	rows, err := db.pool.Query(context.Background(), sql,
 		wordsearch,
@@ -237,7 +295,6 @@ func (db *DB) Search(f *pb.Filter) (*pb.ArrayShortNews, error) {
 	if err != nil {
 		return nil, err
 	}
-	ret := pb.ArrayShortNews{Array: make([]*pb.ShortNew, 0)}
 	for rows.Next() {
 		var id, time, hash *int64
 		var title, desc, url *string
@@ -278,7 +335,7 @@ func getLike(w *pb.FindWord) string {
 }
 
 // создание SQL запроса  из параметров фильтра.
-func formatSQl(f *pb.Filter) (string, error) {
+func formatSQl(f *pb.Filter, sql string) (string, error) {
 	if f == nil {
 		return "", fmt.Errorf("filter is null")
 	}
@@ -286,7 +343,7 @@ func formatSQl(f *pb.Filter) (string, error) {
 	s := f.GetSort()
 	like := getLike(w)
 	sort := getSort(s)
-	return fmt.Sprintf(searchSql, like, like, like, sort), nil
+	return fmt.Sprintf(sql, like, like, like, sort), nil
 }
 
 func getSort(s *pb.OptionSort) string {

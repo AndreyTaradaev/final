@@ -36,8 +36,10 @@ message Id{
     int64 page =1;
 }
 
- message ArrayShortNews{
-    repeated ShortNew array = 1;
+ message ArrayShortNews{ 
+    int64  CountPage =1;    
+    repeated ShortNew array = 2;
+     
 } 
 
 message Result {

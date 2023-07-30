@@ -4,6 +4,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	md "gateway/apigw/pkg/api/midleware"
 	"gateway/apigw/pkg/rpc"
 	"gateway/apigw/pkg/rpc/service"
 	logs "gateway/internal/log"
@@ -54,6 +55,8 @@ func (api *API) Router() *mux.Router {
 
 // Регистрация методов API в маршрутизаторе запросов.
 func (api *API) endpoints() {
+	api.r.Use(api.headersMiddleware)
+	api.r.Use(md.WrapHandlerWithLogging)
 	api.r.HandleFunc("/news/page={id:[0-9]+}", api.page).Methods(http.MethodGet, http.MethodOptions) // получить список  новостей  со страницы (сокращенно)
 	api.r.HandleFunc("/news/{id:[0-9]+}", api.news).Methods(http.MethodGet, http.MethodOptions)      //вернуть список последних новостей  для веб-интефейса
 	api.r.HandleFunc("/news/search", api.search).Methods(http.MethodGet, http.MethodOptions)         //вернуть список  новостей  по фильтру
@@ -68,7 +71,7 @@ func (api *API) endpoints() {
 	api.r.HandleFunc("/comment/{id:[0-9]+}", api.getcomments).Methods(http.MethodGet, http.MethodOptions)
 	api.r.HandleFunc("/comment/{id:[0-9]+}", api.delcomment).Methods(http.MethodDelete, http.MethodOptions)
 	api.r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./webapp"))))
-	api.r.Use(api.headersMiddleware)
+
 }
 
 func (api *API) delcomment(w http.ResponseWriter, r *http.Request) {
@@ -164,7 +167,7 @@ func (api *API) search(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(ret)))
 	w.Header().Set("Endpoint", "search")
-	w.Header().Set("count", fmt.Sprintf("%d", len(arrayNews)))
+	w.Header().Set("count", fmt.Sprintf("%d", len(arrayNews.GetArray())))
 	w.Write(ret)
 }
 
@@ -191,7 +194,7 @@ func (api *API) page(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(ret)))
 	w.Header().Set("Page", pageStr)
 	w.Header().Set("limit", fmt.Sprintf("%d", count))
-	w.Header().Set("CountMews", fmt.Sprintf("%d", len(arrayNews)))
+	w.Header().Set("CountMews", fmt.Sprintf("%d", len(arrayNews.GetArray())))
 	w.Header().Set("Endpoint", "page")
 	w.Write(ret)
 }
@@ -205,7 +208,7 @@ func (api *API) news(w http.ResponseWriter, r *http.Request) {
 	P := tools.GetIntDef(pageStr, 10)
 	arrayNews, err := api.newsClient.ListNews(P)
 
-	ret, err := json.Marshal(arrayNews)
+	ret, err := json.Marshal(arrayNews.GetArray())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -300,7 +303,6 @@ func (api *API) detail(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "id = "+idstr+"\n"+err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	fullnews, err := api.formFullNews(id)
 	if err != nil {
 		http.Error(w, "id news have next error: \n"+err.Error(), http.StatusInternalServerError)
@@ -320,6 +322,7 @@ func (api *API) detail(w http.ResponseWriter, r *http.Request) {
 // headersMiddleware устанавливает заголовки ответа сервера.
 func (api *API) headersMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		if r.URL.String() == "/" {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		} else {
@@ -329,5 +332,6 @@ func (api *API) headersMiddleware(next http.Handler) http.Handler {
 		logs.New().Debug(r.Header)
 		logs.New().Debug(r.URL)
 		next.ServeHTTP(w, r)
+
 	})
 }
