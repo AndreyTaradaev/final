@@ -23,14 +23,14 @@ type config struct {
 
 // пряиой доступ к членам запрещен
 type config_imp struct {
-	Urls        []string `json:"rss"`                   // список ссылок на сервера  по умолчанию пустой
-	Period      int      `json:"request_period"`        // врямя через какое  нужно обновлять новости  по умолчанию 300 сек.
-	Port        int      `json:"port,omitempty"`        // порт который прослушивает gateway по умолчанию 8080
-	NewsHost    string   `json:"newshost,omitempty"`    //  адрес  на котором слушает микросервис новостей  по умолчанию localhost
-	NewsPort    int      `json:"newsport,omitempty"`    //  port  на котором слушает микросервис новостей  по умолчанию 12345
-	CommentHost string   `json:"commenthost,omitempty"` //  адрес  на котором слушает микросервис коментариев  по умолчанию localhost
-	CommentPort int      `json:"commentport,omitempty"` //  port  на котором слушает микросервис комментариев  по умолчанию 12346
-	Logdir      string   `json:"logdir,omitempty"`      //  каталог куда пишем лог ,пустой пишем в stdout
+	Urls        []string `json:"rss,omitempty"`            // список ссылок на сервера  по умолчанию пустой
+	Period      int      `json:"request_period,omitempty"` // врямя через какое  нужно обновлять новости  по умолчанию 300 сек.
+	Port        int      `json:"port,omitempty"`           // порт который прослушивает gateway по умолчанию 8080
+	NewsHost    string   `json:"newshost,omitempty"`       //  адрес  на котором слушает микросервис новостей  по умолчанию localhost
+	NewsPort    int      `json:"newsport,omitempty"`       //  port  на котором слушает микросервис новостей  по умолчанию 12345
+	CommentHost string   `json:"commenthost,omitempty"`    //  адрес  на котором слушает микросервис коментариев  по умолчанию localhost
+	CommentPort int      `json:"commentport,omitempty"`    //  port  на котором слушает микросервис комментариев  по умолчанию 12346
+	Logdir      string   `json:"logdir,omitempty"`         //  каталог куда пишем лог ,пустой пишем в stdout
 }
 
 // справка по программе.
@@ -61,7 +61,7 @@ func Help() string {
 	  			  по умолчанию "localhost"
 "commentport":   port  на котором слушает микросервис комментариев(число ,необязательный )
  	 			  по умолчанию 12346
-"Logdir":        каталог сохранения журнала работы приложения    	  	
+"Logdir":        каталог сохранения журнала работы приложения   (пустая строка вывод в консоль) 	  	
 }
 загрузка настроек по умолчанию происходит из файла конфигурации   config.json 
 в параметрах командной строки  можно загрузку  альтернативной  конфигурации

@@ -10,8 +10,8 @@
       "https://lenta.ru/rss"
    ],
    "request_period": 180,   	
-	  "newsport" : 12000,    
-	"commentport": 10001,
+	  "newsport" : 11200,    
+	"commentport": 11001,
 	"port" : 80,
 	"logdir": ""
 	
