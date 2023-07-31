@@ -160,6 +160,45 @@
 				"header": []
 			},
 			"response": []
+		},
+		{
+			"name": "checkcomment",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": " {\t\t\r\n\t\"content\": \"Ghbrjkmyj1112 asdasdqwertyasdasd\",\r\n\t\"idnews\" : 65222,\t\t\r\n    \"authorid\":  1121 ,\r\n\t\"time\":  5556522222,\r\n    \r\n\"Parent\": 46\r\n\r\n    \t\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "\"http://localhost:12035/comment",
+					"protocol": "\"http",
+					"host": [
+						"localhost"
+					],
+					"port": "12035",
+					"path": [
+						"comment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add wordCensor",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
 		}
 	]
 }

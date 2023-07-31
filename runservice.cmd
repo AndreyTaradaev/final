@@ -9,4 +9,5 @@ start /d "e:\Go\skilfactory\module40\final\news\cmd\" newscmd.exe -debug
 cd "e:\Go\skilfactory\module40\final\comment\cmd\"
 rm -f *.log
 start /d "e:\Go\skilfactory\module40\final\comment\cmd\" comcmd.exe -debug
+start /d "e:\Go\skilfactory\module40\final\censor\cmd\" censorcmd.exe -debug
 pause

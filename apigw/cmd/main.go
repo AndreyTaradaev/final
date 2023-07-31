@@ -44,11 +44,11 @@ func main() {
 	go rss.LoadNews(newstarget, conf.Urls(), conf.Period())
 
 	comenttarget := fmt.Sprintf("%s:%d", conf.СommentHost(), conf.СommentPort())
-
-	log.Info("Start thread dowload rss")
+	censortarget := fmt.Sprintf("%s:%d", conf.CensorHost(), conf.СensorPort())
+	log.Info(" thread dowload rss started ")
 	// инициализация маршрутизатора HTTP и  RPc соединения
 	log.Info("Init Http router")
-	api, err := api.New(newstarget, comenttarget)
+	api, err := api.New(newstarget, comenttarget,censortarget)
 	if err != nil {
 		log.Fatal(err)
 	}

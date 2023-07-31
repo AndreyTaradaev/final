@@ -21,7 +21,7 @@ const (
 		where parent is null and not  banned and id_news=$1 
 		union all 
 		select  com2.id, com2.parent,com2.id_news,com2."Content"  , com2."time",com2."authorId" ,cast (temp1.path||'.'||com2.id as varchar(50)),level+1
-		from gocomments.public.newscomments com2 inner join temp1 on (temp1.id = com2.parent  and not com2.banned ))
+		from gocomments.public.newscomments com2 inner join temp1 on (temp1.id = com2.parent ))
 		select * from temp1
 		order by level,path;	 	
 `
@@ -42,7 +42,7 @@ func New() (*DB, error) {
 
 	connstr := os.Getenv("COMMENTDB")
 	if connstr == "" {
-		return nil, errors.New("не указано подключение к БД в  переменной NEWSDB, формат  postgres://[user]:[passwd]@[host]:[port]/[database]")
+		return nil, errors.New("не указано подключение к БД в  переменной COMMENTDB, формат  postgres://[user]:[passwd]@[host]:[port]/[database]")
 	}
 	pool, err := pgxpool.Connect(context.Background(), connstr)
 	if err != nil {

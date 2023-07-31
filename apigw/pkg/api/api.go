@@ -2,6 +2,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	md "gateway/apigw/pkg/api/midleware"
@@ -22,12 +23,13 @@ type API struct {
 	r             *mux.Router
 	newsClient    rpc.NewsClient
 	commentClient rpc.CommentClient
+	censorServer  string
 }
 
 const timeout int = 120
 
 // Конструктор API.
-func New(newstr, commentstr string) (*API, error) {
+func New(newstr, commentstr, censorstr string) (*API, error) {
 	logger := logs.New()
 	newsclient, err := service.Connect(newstr, timeout)
 	if err != nil {
@@ -40,10 +42,10 @@ func New(newstr, commentstr string) (*API, error) {
 		return nil, err
 	}
 
-	a := API{r: mux.NewRouter(), newsClient: newsclient, commentClient: commentclient}
+	a := API{r: mux.NewRouter(), newsClient: newsclient, commentClient: commentclient, censorServer: "http://" + censorstr + "/comment"}
 	a.endpoints()
 
-	logger.Debug("Init router http")
+	logger.Debug("Init router http  ", a.censorServer)
 	return &a, nil
 }
 
@@ -109,7 +111,6 @@ func (api *API) getcomments(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(jsn)))
 	w.Header().Set("id", idcomment)
 	w.Header().Set("Endpoint", "getcomments")
 	w.Write(jsn)
@@ -119,10 +120,37 @@ func (api *API) addcomment(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodOptions {
 		return
 	}
-	defer r.Body.Close()
+
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	r.Body.Close()
+	Checkbuffer := io.NopCloser(bytes.NewBuffer(b))
+	reqID := r.URL.Query().Get("request_id")
+	if len(reqID) == 0 {
+		reqID = w.Header().Get("Request-ID")
+		r.URL.Query().Add("request_id", reqID)
+	}
+
+	resp, err := api.makeRequest(r, http.MethodGet, api.censorServer, Checkbuffer)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	logs.New().Debugf("service check Comment  status code %d ", resp.StatusCode )	
+	switch resp.StatusCode {
+	case http.StatusInternalServerError:
+		http.Error(w, "Внутренняя ошибка сервиса проверки комментариев", resp.StatusCode)
+		return
+	case http.StatusForbidden:
+		http.Error(w, "Действие запрещено, в комментарии содержатся запрещенные слова ", resp.StatusCode)
+		return
+	case http.StatusOK:
+		break
+	default:
+		http.Error(w, "Действие запрещено, в комментарии содержатся запрещенные слова ", resp.StatusCode)
 		return
 	}
 	var strucBody pb.Comment
@@ -165,7 +193,6 @@ func (api *API) search(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(ret)))
 	w.Header().Set("Endpoint", "search")
 	w.Header().Set("count", fmt.Sprintf("%d", len(arrayNews.GetArray())))
 	w.Write(ret)
@@ -191,7 +218,6 @@ func (api *API) page(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(ret)))
 	w.Header().Set("Page", pageStr)
 	w.Header().Set("limit", fmt.Sprintf("%d", count))
 	w.Header().Set("CountMews", fmt.Sprintf("%d", len(arrayNews.GetArray())))
@@ -213,7 +239,6 @@ func (api *API) news(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(ret)))
 	w.Header().Set("Endpoint", "news")
 	w.Header().Set("count ", pageStr)
 	w.Write(ret)
@@ -234,7 +259,6 @@ func (api *API) list(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(ret)))
 	w.Header().Set("Endpoint", "list")
 	w.Write(ret)
 }
@@ -261,13 +285,13 @@ func receive(channel <-chan interface{}) (*pb.FullNew, error) {
 
 	ret := pb.FullNew{}
 	for a := range channel {
-		switch a.(type) {
+		switch r := a.(type) {
 		case error:
-			return nil, a.(error)
+			return nil, r
 		case *pb.ShortNew:
-			ret.News = a.(*pb.ShortNew)
+			ret.News = r
 		case map[int64]*pb.Comment:
-			ret.Commments = a.(map[int64]*pb.Comment)
+			ret.Commments = r
 		}
 	}
 	return &ret, nil
@@ -313,7 +337,6 @@ func (api *API) detail(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(ret)))
 	w.Header().Set("news_id ", idstr)
 	w.Header().Set("Endpoint", "ful_news")
 	w.Write(ret)
@@ -334,4 +357,15 @@ func (api *API) headersMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 
 	})
+}
+
+// Проверка  коментариев
+func (api *API) makeRequest(req *http.Request, method, url string, body io.ReadCloser) (*http.Response, error) {
+	client := &http.Client{}
+	r, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, err
+	}
+	r.Header = req.Header
+	return client.Do(r)
 }

@@ -30,6 +30,8 @@ type config_imp struct {
 	NewsPort    int      `json:"newsport,omitempty"`       //  port  на котором слушает микросервис новостей  по умолчанию 12345
 	CommentHost string   `json:"commenthost,omitempty"`    //  адрес  на котором слушает микросервис коментариев  по умолчанию localhost
 	CommentPort int      `json:"commentport,omitempty"`    //  port  на котором слушает микросервис комментариев  по умолчанию 12346
+	CensorPort  int      `json:"censorport,omitempty"`     //  port  на котором слушает микросервис цензуры по умолчанию 12347
+	CensorHost  string   `json:"censorhost,omitempty"`     //  адрес  на котором слушает микросервис цензуры  по умолчанию localhost
 	Logdir      string   `json:"logdir,omitempty"`         //  каталог куда пишем лог ,пустой пишем в stdout
 }
 
@@ -61,12 +63,14 @@ func Help() string {
 	  			  по умолчанию "localhost"
 "commentport":   port  на котором слушает микросервис комментариев(число ,необязательный )
  	 			  по умолчанию 12346
+"censorport"     port  на котором слушает микросервис цензуры по умолчанию 12347
+"censorhost"     адрес  на котором слушает микросервис цензуры  по умолчанию localhost
 "Logdir":        каталог сохранения журнала работы приложения   (пустая строка вывод в консоль) 	  	
 }
 загрузка настроек по умолчанию происходит из файла конфигурации   config.json 
 в параметрах командной строки  можно загрузку  альтернативной  конфигурации
 также поддерживается загрузка параметров конфигурации из переменных среды окружения:
-URLS, PERIOD,PORT, NEWSHOST,NEWSPORT,COMMENTHOST,COMMENTPORT,LOGDIR
+URLS, PERIOD,PORT, NEWSHOST,NEWSPORT,COMMENTHOST,COMMENTPORT,LOGDIR, CENSORHOST,CENSORPORT
 переменные окружения имеют приоритет перед файлом
 	 `
 	return h
@@ -85,6 +89,8 @@ func New() *config {
 				NewsPort:    12345,
 				CommentHost: "localhost",
 				CommentPort: 12346,
+				CensorPort:  12347,
+				CensorHost:  "localhost",
 				Logdir:      "", // в stdout
 			},
 		}
@@ -139,10 +145,20 @@ func (c *config) loadFromEnv() {
 			c.conf.CommentPort = p
 		}
 	}
-
+	variable = os.Getenv("CENSORHOST")
+	if len(variable) != 0 {
+		c.conf.CensorHost = variable
+	}
+	variable = os.Getenv("CENSORPORT")
+	if len(variable) != 0 {
+		p, err := strconv.Atoi(variable)
+		if err == nil {
+			c.conf.CensorPort = p
+		}
+	}
 	variable = os.Getenv("Logdir")
 	if len(variable) != 0 {
-		c.conf.CommentHost = variable
+		c.conf.Logdir = variable
 	}
 }
 
@@ -180,6 +196,12 @@ func (c *config) Load(file string) error {
 	if c.conf.CommentPort == 0 {
 		c.conf.CommentPort = 12346
 	}
+	if len(c.conf.CensorHost) == 0 {
+		c.conf.CensorHost = "localhost"
+	}
+	if c.conf.CensorPort == 0 {
+		c.conf.CensorPort = 12347
+	}
 	return nil
 }
 
@@ -188,8 +210,8 @@ func (c *config) String() string {
 	for _, v := range c.conf.Urls {
 		ret += "\n\t" + v
 	}
-	ret += fmt.Sprintf("\nPeriod: %d\nPort: %d,\nNewsHost: %s\n NewsPort: %d\nCommentHost: %s\nCommmentPort: %d\nLogDir: %s",
-		c.conf.Period, c.conf.Port, c.conf.NewsHost, c.conf.NewsPort, c.conf.CommentHost, c.conf.CommentPort, c.conf.Logdir)
+	ret += fmt.Sprintf("\nPeriod: %d\nPort: %d,\nNewsHost: %s\n NewsPort: %d\nCommentHost: %s\nCommmentPort: %d, \nCensorHost: %s\nCensorPort: %d  \nLogDir: %s",
+		c.conf.Period, c.conf.Port, c.conf.NewsHost, c.conf.NewsPort, c.conf.CommentHost, c.conf.CommentPort, c.conf.CensorHost, c.conf.CensorPort, c.conf.Logdir)
 	return ret
 }
 
@@ -226,6 +248,16 @@ func (c *config) СommentHost() string {
 // геттер порт сервера коментов .
 func (c *config) СommentPort() int {
 	return c.conf.CommentPort
+}
+
+// геттер адрес сервера цензуры .
+func (c *config) CensorHost() string {
+	return c.conf.CensorHost
+}
+
+// геттер порт сервера цензуры.
+func (c *config) СensorPort() int {
+	return c.conf.CensorPort
 }
 
 // каталог логов

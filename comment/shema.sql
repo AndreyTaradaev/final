@@ -5,7 +5,7 @@
 -- Dumped from database version 11.9
 -- Dumped by pg_dump version 14.2
 
--- Started on 2023-07-18 14:25:01
+-- Started on 2023-07-31 18:00:08
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -19,18 +19,16 @@ SET client_min_messages = warning;
 SET escape_string_warning = off;
 SET row_security = off;
 
-DROP DATABASE gonews;
+DROP DATABASE gocomments;
 --
--- TOC entry 2180 (class 1262 OID 332256437)
--- Name: gonews; Type: DATABASE; Schema: -; Owner: postgres
+-- TOC entry 2183 (class 1262 OID 335615690)
+-- Name: gocomments; Type: DATABASE; Schema: -; Owner: -
 --
 
-CREATE DATABASE gonews WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE = 'ru_RU.UTF-8' TABLESPACE = archive;
+CREATE DATABASE gocomments WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE = 'ru_RU.UTF-8' TABLESPACE = archive;
 
 
-ALTER DATABASE gonews OWNER TO postgres;
-
-\connect gonews
+\connect gocomments
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -46,18 +44,16 @@ SET row_security = off;
 
 --
 -- TOC entry 3 (class 2615 OID 2200)
--- Name: public; Type: SCHEMA; Schema: -; Owner: postgres
+-- Name: public; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA public;
 
 
-ALTER SCHEMA public OWNER TO postgres;
-
 --
--- TOC entry 2181 (class 0 OID 0)
+-- TOC entry 2184 (class 0 OID 0)
 -- Dependencies: 3
--- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: postgres
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON SCHEMA public IS 'standard public schema';
@@ -66,82 +62,26 @@ COMMENT ON SCHEMA public IS 'standard public schema';
 SET default_tablespace = '';
 
 --
--- TOC entry 197 (class 1259 OID 332258818)
--- Name: NewsRss; Type: TABLE; Schema: public; Owner: postgres
+-- TOC entry 197 (class 1259 OID 335617507)
+-- Name: newscomments; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public."NewsRss" (
+CREATE TABLE public.newscomments (
     id bigint NOT NULL,
-    title character varying NOT NULL,
-    description character varying,
-    "time" bigint NOT NULL,
-    url character varying NOT NULL,
-    hashrss bigint NOT NULL
+    id_news bigint NOT NULL,
+    "Content" character varying,
+    parent bigint,
+    "time" bigint,
+    "authorId" bigint NOT NULL
 );
 
 
-ALTER TABLE public."NewsRss" OWNER TO postgres;
-
 --
--- TOC entry 2182 (class 0 OID 0)
--- Dependencies: 197
--- Name: COLUMN "NewsRss".id; Type: COMMENT; Schema: public; Owner: postgres
+-- TOC entry 196 (class 1259 OID 335617505)
+-- Name: newscomments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN public."NewsRss".id IS 'id rss';
-
-
---
--- TOC entry 2183 (class 0 OID 0)
--- Dependencies: 197
--- Name: COLUMN "NewsRss".title; Type: COMMENT; Schema: public; Owner: postgres
---
-
-COMMENT ON COLUMN public."NewsRss".title IS 'title rss';
-
-
---
--- TOC entry 2184 (class 0 OID 0)
--- Dependencies: 197
--- Name: COLUMN "NewsRss".description; Type: COMMENT; Schema: public; Owner: postgres
---
-
-COMMENT ON COLUMN public."NewsRss".description IS 'тело новости';
-
-
---
--- TOC entry 2185 (class 0 OID 0)
--- Dependencies: 197
--- Name: COLUMN "NewsRss"."time"; Type: COMMENT; Schema: public; Owner: postgres
---
-
-COMMENT ON COLUMN public."NewsRss"."time" IS 'время новости';
-
-
---
--- TOC entry 2186 (class 0 OID 0)
--- Dependencies: 197
--- Name: COLUMN "NewsRss".url; Type: COMMENT; Schema: public; Owner: postgres
---
-
-COMMENT ON COLUMN public."NewsRss".url IS 'ссылка  на новость';
-
-
---
--- TOC entry 2187 (class 0 OID 0)
--- Dependencies: 197
--- Name: COLUMN "NewsRss".hashrss; Type: COMMENT; Schema: public; Owner: postgres
---
-
-COMMENT ON COLUMN public."NewsRss".hashrss IS 'crc64 расчитывается по ИД новости для того чтобы исключить дублирование загрузки одинаковых новостей';
-
-
---
--- TOC entry 196 (class 1259 OID 332258816)
--- Name: NewsRss_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public."NewsRss_id_seq"
+CREATE SEQUENCE public.newscomments_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -149,43 +89,104 @@ CREATE SEQUENCE public."NewsRss_id_seq"
     CACHE 1;
 
 
-ALTER TABLE public."NewsRss_id_seq" OWNER TO postgres;
-
 --
--- TOC entry 2188 (class 0 OID 0)
+-- TOC entry 2185 (class 0 OID 0)
 -- Dependencies: 196
--- Name: NewsRss_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: newscomments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public."NewsRss_id_seq" OWNED BY public."NewsRss".id;
-
-
---
--- TOC entry 2051 (class 2604 OID 332258821)
--- Name: NewsRss id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public."NewsRss" ALTER COLUMN id SET DEFAULT nextval('public."NewsRss_id_seq"'::regclass);
+ALTER SEQUENCE public.newscomments_id_seq OWNED BY public.newscomments.id;
 
 
 --
--- TOC entry 2174 (class 0 OID 332258818)
+-- TOC entry 2051 (class 2604 OID 335617510)
+-- Name: newscomments id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.newscomments ALTER COLUMN id SET DEFAULT nextval('public.newscomments_id_seq'::regclass);
+
+
+--
+-- TOC entry 2177 (class 0 OID 335617507)
 -- Dependencies: 197
--- Data for Name: NewsRss; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: newscomments; Type: TABLE DATA; Schema: public; Owner: -
 --
 
+INSERT INTO public.newscomments VALUES (21, 123015, 'coment eeewer123123', NULL, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (22, 123015, 'coment eeewer1231232', 21, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (23, 123015, 'coment eeewer1231232', 22, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (24, 123015, 'coment eeewer1231232', 22, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (10, 22490, 'coment', NULL, 55555, 111);
+INSERT INTO public.newscomments VALUES (11, 22490, 'coment2', NULL, 55565, 112);
+INSERT INTO public.newscomments VALUES (12, 22490, 'coment eeewer1', NULL, 555657, 112);
+INSERT INTO public.newscomments VALUES (13, 22490, 'coment eeewer2', 10, 8, 112);
+INSERT INTO public.newscomments VALUES (14, 22490, 'coment eeewer3', 10, 555565, 112);
+INSERT INTO public.newscomments VALUES (15, 22490, 'coment eeewer4', 14, 455565, 112);
+INSERT INTO public.newscomments VALUES (16, 22490, 'coment eeewer5', 15, 255565, 112);
+INSERT INTO public.newscomments VALUES (17, 22490, 'coment eeewer7', 13, 155565, 112);
+INSERT INTO public.newscomments VALUES (18, 22490, 'coment eeewer9', 16, 55565421, 112);
+INSERT INTO public.newscomments VALUES (19, 22490, 'coment eeewer0', 14, 55565998, 112);
+INSERT INTO public.newscomments VALUES (20, 22490, 'coment eeewer123123', 11, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (27, 65222, 'Ghbrjkmyj', NULL, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (28, 65222, 'Ghbrjkmyj', 27, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (29, 65222, 'Ghbrjkmyj111', NULL, 5556522222, 0);
+INSERT INTO public.newscomments VALUES (30, 65222, 'Ghbrjkmyj111', NULL, 5556522222, 0);
+INSERT INTO public.newscomments VALUES (31, 65222, 'Ghbrjkmyj111', 30, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (32, 65222, 'Ghbrjkmyj1112', 30, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (33, 65222, 'Ghbrjkmyj1112', 32, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (35, 65222, 'Ghbrjkmyj1112', 34, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (36, 65222, 'Ghbrjkmyj1112', 34, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (37, 65222, 'Ghbrjkmyj1112', 36, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (38, 65222, 'Ghbrjkmyj1112', 36, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (39, 65222, 'Ghbrjkmyj1112', 36, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (40, 65222, 'Ghbrjkmyj1112', 36, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (41, 65222, 'Ghbrjkmyj1112', 40, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (42, 65222, 'Ghbrjkmyj1112', 41, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (43, 65222, 'Ghbrjkmyj1112', 42, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (44, 65222, 'Ghbrjkmyj1112', 42, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (45, 65222, 'Ghbrjkmyj1112', 42, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (46, 65222, 'Ghbrjkmyj1112', 42, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (47, 65222, 'Ghbrjkmyj1112', 46, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (48, 65222, 'Ghbrjkmyj1112', 46, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (34, 65222, 'Ghbrjkmyj1112', 32, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (49, 65222, 'Ghbrjkmyj1112', 46, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (50, 65222, 'Ghbrjkmyj1112', 46, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (51, 65222, 'Ghbrjkmyj1112 qwerty', 46, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (52, 65222, 'Ghbrjkmyj1112 qwerty', 46, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (53, 65222, 'Ghbrjkmyj1112 qwerty', 46, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (54, 65222, 'Ghbrjkmyj1112 qwerty', 46, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (55, 65222, 'Ghbrjkmyj1112 qwerty', 46, 5556522222, 1121);
+INSERT INTO public.newscomments VALUES (56, 65222, 'Ghbrjkmyj1112 asdasdqertyasdasd', 46, 5556522222, 1121);
 
 
 --
--- TOC entry 2189 (class 0 OID 0)
+-- TOC entry 2186 (class 0 OID 0)
 -- Dependencies: 196
--- Name: NewsRss_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: newscomments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."NewsRss_id_seq"', 1, false);
+SELECT pg_catalog.setval('public.newscomments_id_seq', 56, true);
 
 
--- Completed on 2023-07-18 14:25:03
+--
+-- TOC entry 2053 (class 2606 OID 335617515)
+-- Name: newscomments newscomments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.newscomments
+    ADD CONSTRAINT newscomments_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2054 (class 2606 OID 335617516)
+-- Name: newscomments newscomments_parent_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.newscomments
+    ADD CONSTRAINT newscomments_parent_fkey FOREIGN KEY (parent) REFERENCES public.newscomments(id);
+
+
+-- Completed on 2023-07-31 18:00:11
 
 --
 -- PostgreSQL database dump complete

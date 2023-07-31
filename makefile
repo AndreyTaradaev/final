@@ -2,14 +2,17 @@
 BINARY_NAME_GW=apicmd.exe
 BINARY_NAME_NEWS=newscmd.exe
 BINARY_NAME_COMMENT=comcmd.exe
+BINARY_NAME_CENSOR=censorcmd.exe
 BINARY_DIR=./bin
 SOURCE_GATE=./apigw/cmd/
 SOURCE_NEWS=./news/cmd/
 SOURCE_COMMENT=./comment/cmd/
+SOURCE_CENSOR=./censor/cmd/
 gate:  ${SOURCE_GATE}main.go
 	 
 	go build  -o ${SOURCE_GATE}/${BINARY_NAME_GW}  ${SOURCE_GATE}
-	
+censor : 
+	go build  -o ${SOURCE_CENSOR}/${BINARY_NAME_CENSOR}  ${SOURCE_CENSOR}	
 
 news:  ${SOURCE_NEWS}newscmd.go
 	
@@ -20,19 +23,21 @@ comment:  ${SOURCE_COMMENT}comcmd.go
 	
 	go build  -o ${SOURCE_COMMENT}/${BINARY_NAME_COMMENT}  ${SOURCE_COMMENT}
 		
-build: 	gate news comment
+build: 	gate news comment censor
 
 install: ${SOURCE_GATE}/${BINARY_NAME_GW}  ${SOURCE_NEWS}/${BINARY_NAME_NEWS}  ${SOURCE_COMMENT}/${BINARY_NAME_COMMENT}
 	mkdir -p ${BINARY_DIR}/gw/
 	mkdir -p ${BINARY_DIR}/news/ 
 	mkdir -p ${BINARY_DIR}/comment/ 
+	mkdir -p ${BINARY_DIR}/censor/ 
 	cp ${SOURCE_GATE}config.json ./${BINARY_DIR}/gw
 	cp ${SOURCE_NEWS}config.json ./${BINARY_DIR}/news
 	cp ${SOURCE_COMMENT}config.json ./${BINARY_DIR}/comment
+	cp ${SOURCE_CENSOR}config.json ./${BINARY_DIR}/censor
 	cp ${SOURCE_GATE}/${BINARY_NAME_GW}   ./${BINARY_DIR}/gw/
 	cp ${SOURCE_NEWS}/${BINARY_NAME_NEWS} ./${BINARY_DIR}/news/
 	cp ${SOURCE_COMMENT}/${BINARY_NAME_COMMENT} ./${BINARY_DIR}/comment/
-	
+	cp ${SOURCE_CENSOR}/${BINARY_NAME_CENSOR} ./${BINARY_DIR}/censor/
 #run:	install
 #	@-./${BINARY_DIR}/comment/comcmd.exe
 #	./${BINARY_DIR}/news/newscmd.exe
@@ -44,7 +49,8 @@ install: ${SOURCE_GATE}/${BINARY_NAME_GW}  ${SOURCE_NEWS}/${BINARY_NAME_NEWS}  $
 #	start /d   ./${BINARY_DIR}/gw  apicmd.exe -debug
 
 uninstall: 
-	rm -f ${BINARY_DIR}/gw/* 
-	rm -f ${BINARY_DIR}/news/*
-	rm -f ${BINARY_DIR}/comment/* 
+	rm -f ./${BINARY_DIR}/gw/* 
+	rm -f ./${BINARY_DIR}/news/*
+	rm -f ./${BINARY_DIR}/comment/* 
+	rm -f ./${BINARY_DIR}/censor/
 	
