@@ -1,16 +1,25 @@
-// программа является  машрутизатором от клиентов к микросервисам
-// получается  сервер HTTP от клиентов -> клиент в нашем случае RPC
+// микросервис проверки комментариев
 package main
 
 import (
 	"fmt"
+	_ "gateway/censor/cmd/docs"
 	"gateway/censor/pkg/api"
 	"gateway/censor/pkg/config"
-
 	logs "gateway/internal/log"
 	tools "gateway/internal/tools"
 	"net/http"
 )
+
+// @title Orders API
+// @version 1.0
+// @description This is a sample service for managing orders
+// @termsOfService http://swagger.io/terms/
+// @contact.name API Support
+// @contact.email soberkoder@swagger.io
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @BasePath /
 
 func main() {
 	//парсим командную строку

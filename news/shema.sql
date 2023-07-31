@@ -1,11 +1,3 @@
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 11.9
--- Dumped by pg_dump version 14.2
-
--- Started on 2023-07-31 18:00:48
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -19,13 +11,12 @@ SET client_min_messages = warning;
 SET escape_string_warning = off;
 SET row_security = off;
 
-DROP DATABASE gonews;
 --
 -- TOC entry 2183 (class 1262 OID 332256437)
 -- Name: gonews; Type: DATABASE; Schema: -; Owner: -
 --
 
-CREATE DATABASE gonews WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE = 'ru_RU.UTF-8' TABLESPACE = archive;
+CREATE DATABASE gonews WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE = 'ru_RU.UTF-8' ;
 
 
 \connect gonews
