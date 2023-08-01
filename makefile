@@ -7,23 +7,29 @@ BINARY_DIR=./bin
 SOURCE_GATE=./apigw/cmd/
 SOURCE_NEWS=./news/cmd/
 SOURCE_COMMENT=./comment/cmd/
-SOURCE_CENSOR=./censor/cmd/
+SOURCE_CENSOR=./censor/
+
+test:
+	echo ${PWD}
+
 gate:  ${SOURCE_GATE}main.go
 	 
 	go build  -o ${SOURCE_GATE}/${BINARY_NAME_GW}  ${SOURCE_GATE}
-censor : 
+	
+censors: ${SOURCE_CENSOR}main.go	
+	swag init -d ${SOURCE_CENSOR}
 	go build  -o ${SOURCE_CENSOR}/${BINARY_NAME_CENSOR}  ${SOURCE_CENSOR}	
 
-news:  ${SOURCE_NEWS}newscmd.go
+new:  ${SOURCE_NEWS}newscmd.go
 	
 	go build  -o ${SOURCE_NEWS}/${BINARY_NAME_NEWS}  ${SOURCE_NEWS}
 	
 	
-comment:  ${SOURCE_COMMENT}comcmd.go
+comments:  ${SOURCE_COMMENT}comcmd.go
 	
 	go build  -o ${SOURCE_COMMENT}/${BINARY_NAME_COMMENT}  ${SOURCE_COMMENT}
 		
-build: 	gate news comment censor
+build: 	gate new comments censors
 
 install: ${SOURCE_GATE}/${BINARY_NAME_GW}  ${SOURCE_NEWS}/${BINARY_NAME_NEWS}  ${SOURCE_COMMENT}/${BINARY_NAME_COMMENT}
 	mkdir -p ${BINARY_DIR}/gw/

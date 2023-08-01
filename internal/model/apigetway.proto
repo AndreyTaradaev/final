@@ -20,8 +20,8 @@ message ShortNew {
 }
 
 message FullNew{
-   ShortNew  News =1;  
-   map  <int64,Comment>  Commments = 2;
+   ShortNew  News =1;   // Новость
+   map  <int64,Comment>  Commments = 2;  //коментарии
 }
 
 message Forlist {
@@ -37,8 +37,8 @@ message Id{
 }
 
  message ArrayShortNews{ 
-    int64  CountPage =1;    
-    repeated ShortNew array = 2;
+    int64  CountPage =1;     //количество страниц
+    repeated ShortNew array = 2; //массив новостей
      
 } 
 
@@ -98,14 +98,14 @@ service RssService {
  }
 
  message Comment{    
-    optional int64 id =1;    
-    optional int64    parent = 2;
-    string   content   = 3;
-     int64   idnews   = 4;
-    int64    authorid  = 5; 
+    optional int64 id =1;    // номер коментария
+    optional int64    parent = 2;  // родительский коментарий
+    string   content   = 3;  // содержание
+     int64   idnews   = 4;  // номер новости
+    int64    authorid  = 5;  // ИД автора новости(неиспоьзуется)
     reserved  "unknown"; //string    Author   = 5 ;
-    int64     time  =7 ;    
-    map  <int64,Comment>  child = 8; 
+    int64     time  =7 ;    // время создания новости
+    map  <int64,Comment>  child = 8;  // дочерние комментарии
     }
 
 /* message branchComment{
@@ -114,7 +114,7 @@ service RssService {
 } */
 
 message TreeComments{   
-    map  <int64,Comment>  comments = 2;
+    map  <int64,Comment>  comments = 2; //дерево коментариев
 }
 
 service CommentService {

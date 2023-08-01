@@ -270,8 +270,8 @@ type FullNew struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	News      *ShortNew          `protobuf:"bytes,1,opt,name=News,proto3" json:"News,omitempty"`
-	Commments map[int64]*Comment `protobuf:"bytes,2,rep,name=Commments,proto3" json:"Commments,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	News      *ShortNew          `protobuf:"bytes,1,opt,name=News,proto3" json:"News,omitempty"`                                                                                                    // Новость
+	Commments map[int64]*Comment `protobuf:"bytes,2,rep,name=Commments,proto3" json:"Commments,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"` //коментарии
 }
 
 func (x *FullNew) Reset() {
@@ -474,8 +474,8 @@ type ArrayShortNews struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	CountPage int64       `protobuf:"varint,1,opt,name=CountPage,proto3" json:"CountPage,omitempty"`
-	Array     []*ShortNew `protobuf:"bytes,2,rep,name=array,proto3" json:"array,omitempty"`
+	CountPage int64       `protobuf:"varint,1,opt,name=CountPage,proto3" json:"CountPage,omitempty"` //количество страниц
+	Array     []*ShortNew `protobuf:"bytes,2,rep,name=array,proto3" json:"array,omitempty"`          //массив новостей
 }
 
 func (x *ArrayShortNews) Reset() {
@@ -812,13 +812,13 @@ type Comment struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id       *int64             `protobuf:"varint,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
-	Parent   *int64             `protobuf:"varint,2,opt,name=parent,proto3,oneof" json:"parent,omitempty"`
-	Content  string             `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
-	Idnews   int64              `protobuf:"varint,4,opt,name=idnews,proto3" json:"idnews,omitempty"`
-	Authorid int64              `protobuf:"varint,5,opt,name=authorid,proto3" json:"authorid,omitempty"`
-	Time     int64              `protobuf:"varint,7,opt,name=time,proto3" json:"time,omitempty"`
-	Child    map[int64]*Comment `protobuf:"bytes,8,rep,name=child,proto3" json:"child,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Id       *int64             `protobuf:"varint,1,opt,name=id,proto3,oneof" json:"id,omitempty"`                                                                                         // номер коментария
+	Parent   *int64             `protobuf:"varint,2,opt,name=parent,proto3,oneof" json:"parent,omitempty"`                                                                                 // родительский коментарий
+	Content  string             `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`                                                                                      // содержание
+	Idnews   int64              `protobuf:"varint,4,opt,name=idnews,proto3" json:"idnews,omitempty"`                                                                                       // номер новости
+	Authorid int64              `protobuf:"varint,5,opt,name=authorid,proto3" json:"authorid,omitempty"`                                                                                   // ИД автора новости(неиспоьзуется)
+	Time     int64              `protobuf:"varint,7,opt,name=time,proto3" json:"time,omitempty"`                                                                                           // время создания новости
+	Child    map[int64]*Comment `protobuf:"bytes,8,rep,name=child,proto3" json:"child,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"` // дочерние комментарии
 }
 
 func (x *Comment) Reset() {
@@ -907,7 +907,7 @@ type TreeComments struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Comments map[int64]*Comment `protobuf:"bytes,2,rep,name=comments,proto3" json:"comments,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Comments map[int64]*Comment `protobuf:"bytes,2,rep,name=comments,proto3" json:"comments,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"` //дерево коментариев
 }
 
 func (x *TreeComments) Reset() {

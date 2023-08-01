@@ -1,0 +1,98 @@
+basePath: /
+definitions:
+  model.Comment:
+    properties:
+      authorid:
+        description: ИД автора новости(неиспоьзуется)
+        type: integer
+      child:
+        additionalProperties:
+          $ref: '#/definitions/model.Comment'
+        description: дочерние комментарии
+        type: object
+      content:
+        description: содержание
+        type: string
+      id:
+        description: номер коментария
+        type: integer
+      idnews:
+        description: номер новости
+        type: integer
+      parent:
+        description: родительский коментарий
+        type: integer
+      time:
+        description: время создания новости
+        type: integer
+    type: object
+info:
+  contact:
+    email: ataradaev@swagger.io
+    name: API Support
+  description: Проверка Коментариев на запрещенные слова
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Check Comment API
+  version: "1.0"
+paths:
+  /comment:
+    post:
+      consumes:
+      - application/json
+      description: checked  comment on forbidden words
+      operationId: Check comment for router
+      parameters:
+      - description: структура комментарий
+        in: body
+        name: Комментарий
+        required: true
+        schema:
+          $ref: '#/definitions/model.Comment'
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Комментарий прошел проверку
+          schema:
+            type: string
+        "403":
+          description: найдено запрещенные слова
+          schema:
+            type: string
+        "500":
+          description: внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: check  Comment
+      tags:
+      - Comment
+  /comment/word/{word}:
+    post:
+      description: added forbidden word
+      operationId: add word
+      parameters:
+      - description: Word
+        in: path
+        name: word
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Слово добавлено
+          schema:
+            type: string
+        "500":
+          description: внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: Add  forbidden word in DB
+      tags:
+      - Addword
+swagger: "2.0"
+tags:
+- name: CheckedComment

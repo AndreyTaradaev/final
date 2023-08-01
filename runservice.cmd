@@ -1,13 +1,13 @@
 
 rm -f news/cmd/*log
 rm -f comment/cmd/*log
-cd "e:\Go\skilfactory\module40\final\apigw\cmd\"
+cd "e:\Go\skilfactory\module40\final\apigw\"
 rm -f *.log
 cd "e:\Go\skilfactory\module40\final\news\cmd\"
 rm -f *.log
 start /d "e:\Go\skilfactory\module40\final\news\cmd\" newscmd.exe -debug
-cd "e:\Go\skilfactory\module40\final\comment\cmd\"
+cd "e:\Go\skilfactory\module40\final\comment\"
 rm -f *.log
 start /d "e:\Go\skilfactory\module40\final\comment\cmd\" comcmd.exe -debug
-start /d "e:\Go\skilfactory\module40\final\censor\cmd\" censorcmd.exe -debug
+start /d "e:\Go\skilfactory\module40\final\censor\" censorcmd.exe -debug
 pause

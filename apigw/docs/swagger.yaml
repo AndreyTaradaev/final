@@ -1,0 +1,291 @@
+basePath: /
+definitions:
+  model.ArrayShortNews:
+    properties:
+      CountPage:
+        description: количество страниц
+        type: integer
+      array:
+        description: массив новостей
+        items:
+          $ref: '#/definitions/model.ShortNew'
+        type: array
+    type: object
+  model.Comment:
+    properties:
+      authorid:
+        description: ИД автора новости(неиспоьзуется)
+        type: integer
+      child:
+        additionalProperties:
+          $ref: '#/definitions/model.Comment'
+        description: дочерние комментарии
+        type: object
+      content:
+        description: содержание
+        type: string
+      id:
+        description: номер коментария
+        type: integer
+      idnews:
+        description: номер новости
+        type: integer
+      parent:
+        description: родительский коментарий
+        type: integer
+      time:
+        description: время создания новости
+        type: integer
+    type: object
+  model.FullNew:
+    properties:
+      Commments:
+        additionalProperties:
+          $ref: '#/definitions/model.Comment'
+        description: коментарии
+        type: object
+      News:
+        allOf:
+        - $ref: '#/definitions/model.ShortNew'
+        description: Новость
+    type: object
+  model.ShortNew:
+    properties:
+      Content:
+        description: содержание публикации
+        type: string
+      Hash:
+        description: Хеш  новости
+        type: integer
+      ID:
+        description: номер записи
+        type: integer
+      Link:
+        description: ссылка на источник
+        type: string
+      PubTime:
+        description: время публикации
+        type: integer
+      Title:
+        description: заголовок публикации
+        type: string
+    type: object
+info:
+  contact:
+    email: ataradaev@swagger.io
+    name: API Support Gateway
+  description: Rest api for collect news
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Маршрутизатор  агрегатора новостей
+  version: "1.0"
+paths:
+  /comment/{id}:
+    delete:
+      description: deleted comment from news
+      operationId: del comment
+      parameters:
+      - description: id комментария для удаления
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: коментарий удален
+          schema:
+            type: string
+        "500":
+          description: внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: Delete comment
+    get:
+      description: получает дерево комментариев для определеной новости
+      operationId: tree comment
+      parameters:
+      - description: id Новости
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Дерево комментариев
+          schema:
+            items:
+              $ref: '#/definitions/model.Comment'
+            type: array
+        "500":
+          description: внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: получение  коментариев для новости
+    post:
+      description: Добавляет коментарий для определенной новости
+      operationId: tree comment
+      parameters:
+      - description: структура комментарий
+        in: body
+        name: Комментарий
+        required: true
+        schema:
+          $ref: '#/definitions/model.Comment'
+      - description: Ид новости
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: коментарий добавлен
+          schema:
+            type: string
+        "403":
+          description: Комментарий содержит запрещенные слова
+          schema:
+            type: string
+        "500":
+          description: внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: добавление коментария
+  /news/{id}:
+    get:
+      description: последние новости
+      operationId: page news latest
+      parameters:
+      - description: Количество последних новостей для веб-интерфейса
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: массив новостей
+          schema:
+            items:
+              $ref: '#/definitions/model.ShortNew'
+            type: array
+        "500":
+          description: внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: список последних новостей
+  /news/detail/{id}:
+    get:
+      description: Детальная новость
+      operationId: detail news
+      parameters:
+      - description: Ид новости
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: новость
+          schema:
+            $ref: '#/definitions/model.FullNew'
+        "500":
+          description: внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: новость с коментариями
+  /news/page/{id}:
+    get:
+      description: новости постранично
+      operationId: page news
+      parameters:
+      - description: номер страницы
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: ' количество новостей на странице'
+        in: query
+        name: count
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: массив новостей
+          schema:
+            $ref: '#/definitions/model.ArrayShortNews'
+        "500":
+          description: внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: список новостей с страницы
+  /news/search:
+    get:
+      description: поиск и сортировка новостей по параметрам
+      operationId: search news
+      parameters:
+      - description: слово для поиска
+        in: query
+        name: word
+        type: string
+      - description: 'условиесортировки: 0- слово целиком, 1-часть слова, 2-не включая
+          слово, не включая часть слова'
+        enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        in: query
+        name: type
+        type: integer
+      - description: сортировка по полю
+        enum:
+        - id
+        - title
+        - desc
+        - data
+        - url
+        in: query
+        name: sort
+        type: string
+      - description: 'сортировка по полю '
+        enum:
+        - asc
+        - desc
+        in: query
+        name: direction
+        type: string
+      - description: начальная дата новостей (Unix-формат)
+        in: query
+        name: startdate
+        type: integer
+      - description: конечная дата новостей (Unix-формат)
+        in: query
+        name: enddate
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: массив новостей"//
+          schema:
+            $ref: '#/definitions/model.ArrayShortNews'
+        "500":
+          description: внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: поиск новостей по  фильтру
+swagger: "2.0"
+tags:
+- name: news server
