@@ -69,7 +69,7 @@ paths:
       summary: check  Comment
       tags:
       - Comment
-  /comment/word/{word}:
+  /word/{word}:
     post:
       description: added forbidden word
       operationId: add word

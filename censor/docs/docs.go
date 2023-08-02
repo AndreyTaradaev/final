@@ -71,7 +71,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/comment/word/{word}": {
+        "/word/{word}": {
             "post": {
                 "description": "added forbidden word",
                 "produces": [

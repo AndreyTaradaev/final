@@ -20,23 +20,6 @@ func LoadNews(rpctarget string, urls []string, sec int) {
 		return
 	}
 
-	f := func(client rpc.LoadClient, url string) {
-		nw, err := loadRss(url)
-		if err != nil {
-			logger.Error("urls: " + url + ", " + err.Error())
-			return
-		}
-		if nw.Len() == 0 {
-			logger.Debug("array is emply")
-			return
-		}
-		logger.Debugf("urls: %s , loaded %d news", url, nw.Len())
-		err = writeNews(client, nw)
-		if err != nil {
-			logger.Error("Load news on server  " + rpctarget + ", " + err.Error())
-		}
-	}
-
 	for {
 		select {
 		case <-time.After(time.Second * time.Duration(sec)): // time.After вызывается 1 раз поэтому в цикле
@@ -47,11 +30,29 @@ func LoadNews(rpctarget string, urls []string, sec int) {
 			}
 			defer c.Close()
 			for _, v := range urls {
-				go f(c, v)
+				go addnews(c, v)
 			}
 		}
 	}
 
+}
+
+func addnews(client rpc.LoadClient, url string) {
+	logger := logs.New()
+	nw, err := loadRss(url)
+	if err != nil {
+		logger.Error("urls: " + url + ", " + err.Error())
+		return
+	}
+	if nw.Len() == 0 {
+		logger.Debug("array is emply")
+		return
+	}
+	logger.Debugf("urls: %s , loaded %d news", url, nw.Len())
+	err = writeNews(client, nw)
+	if err != nil {
+		logger.Error("Load news on server  " + url + ", " + err.Error())
+	}
 }
 
 func createClient(target string) (rpc.LoadClient, error) {

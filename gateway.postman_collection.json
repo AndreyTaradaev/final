@@ -11,13 +11,25 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localost/news/page=2",
+					"raw": "localhost/news/page/1?count=25",
 					"host": [
-						"localost"
+						"localhost"
 					],
 					"path": [
 						"news",
-						"page=2"
+						"page",
+						"1"
+					],
+					"query": [
+						{
+							"key": "request_id",
+							"value": "2222",
+							"disabled": true
+						},
+						{
+							"key": "count",
+							"value": "25"
+						}
 					]
 				}
 			},
@@ -45,7 +57,19 @@
 			"name": "detail",
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": "http://localhost/news/detail/65222",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"news",
+						"detail",
+						"65222"
+					]
+				}
 			},
 			"response": []
 		},

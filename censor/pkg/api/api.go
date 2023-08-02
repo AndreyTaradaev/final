@@ -52,7 +52,7 @@ func (api *API) Router() *mux.Router {
 func (api *API) endpoints() {
 	api.r.Use(api.headersMiddleware)
 	api.r.HandleFunc("/comment", api.checkComment).Methods(http.MethodPost, http.MethodOptions)
-	api.r.HandleFunc("/comment/word/{w}", api.addWord).Methods(http.MethodPost, http.MethodOptions)
+	api.r.HandleFunc("/word/{w}", api.addWord).Methods(http.MethodPost, http.MethodOptions)
 	api.r.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
 }
 
@@ -68,7 +68,7 @@ func (api *API) endpoints() {
 //
 //	@Failure		500	{string}	string 	"внутренняя ошибка сервера"
 //
-// @Router /comment/word/{word} [post]
+// @Router /word/{word} [post]
 func (api *API) addWord(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodOptions {
 		return
@@ -110,6 +110,7 @@ func (api *API) checkComment(w http.ResponseWriter, r *http.Request) {
 	b, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	if err != nil {
+		logs.New().Debug(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -117,11 +118,13 @@ func (api *API) checkComment(w http.ResponseWriter, r *http.Request) {
 
 	err = json.Unmarshal(b, &strucBody)
 	if err != nil {
+		logs.New().Debug(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	ret, err := api.db.CheckComment(&strucBody)
 	if err != nil {
+		logs.New().Debug(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

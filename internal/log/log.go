@@ -31,7 +31,7 @@ func InitConfig(dir string, debug bool) {
 		tf.FullTimestamp = true
 
 	} else {
-		f, err := os.OpenFile(dir+"/"+exename+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0755)
+		f, err := os.OpenFile(dir+"/"+exename+".log", os.O_RDWR|os.O_CREATE/* |os.O_APPEND*/,  0755)
 		if err != nil {
 			logger.SetOutput(os.Stdout)
 			tf.ForceColors = true

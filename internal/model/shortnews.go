@@ -17,7 +17,7 @@ func NewShort(id int64, title string, content string, time int64, link string, i
 	ret.Hash = int64(crc64.Checksum([]byte(idNews), crc64.MakeTable(crc64.ISO)))
 	return &ret
 }
-
+// Длина среза.
 func (a *ArrayShortNews) Len() int {
 	return len(a.GetArray())
 }

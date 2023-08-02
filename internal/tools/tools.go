@@ -68,9 +68,12 @@ func GetBase(path string) string {
 // Имя файла без расширения
 func FileNamewithoutExt(path string) string {
 	f := filepath.Base(path)
-	if strings.HasSuffix(f, ".exe") {
-		f = strings.TrimSuffix(f, ".exe")
+	n := strings.LastIndex(f, ".")
+	if n == -1 {
+		return f
 	}
+	b := []byte(f)
+	f = string(b[0:n])
 	return f
 }
 

@@ -7,8 +7,7 @@ import (
 	"gateway/internal/tools"
 	"io/ioutil"
 	"os"
-	"path/filepath"
-	"strconv"
+	"path/filepath"	
 	"strings"
 	"sync"
 )
@@ -109,17 +108,11 @@ func (c *config) loadFromEnv() {
 	}
 	variable = os.Getenv("PERIOD")
 	if len(variable) != 0 {
-		p, err := strconv.Atoi(variable)
-		if err == nil {
-			c.conf.Period = p
-		}
+		c.conf.Period = int(tools.GetIntDef(variable, int64(c.conf.Period)))
 	}
 	variable = os.Getenv("PORT")
 	if len(variable) != 0 {
-		p, err := strconv.Atoi(variable)
-		if err == nil {
-			c.conf.Port = p
-		}
+		c.conf.Port = int(tools.GetIntDef(variable, int64(c.conf.Port)))
 	}
 
 	variable = os.Getenv("NEWSHOST")
@@ -127,11 +120,8 @@ func (c *config) loadFromEnv() {
 		c.conf.NewsHost = variable
 	}
 	variable = os.Getenv("NEWSPORT")
-	if len(variable) != 0 {
-		p, err := strconv.Atoi(variable)
-		if err == nil {
-			c.conf.NewsPort = p
-		}
+	if len(variable) != 0 {		
+			c.conf.NewsPort = int(tools.GetIntDef(variable, int64(c.conf.NewsPort)))		
 	}
 
 	variable = os.Getenv("COMMENTHOST")
@@ -139,22 +129,16 @@ func (c *config) loadFromEnv() {
 		c.conf.CommentHost = variable
 	}
 	variable = os.Getenv("COMMENTPORT")
-	if len(variable) != 0 {
-		p, err := strconv.Atoi(variable)
-		if err == nil {
-			c.conf.CommentPort = p
-		}
+	if len(variable) != 0 {		
+			c.conf.CommentPort = int(tools.GetIntDef(variable, int64(c.conf.CommentPort)))		
 	}
 	variable = os.Getenv("CENSORHOST")
 	if len(variable) != 0 {
 		c.conf.CensorHost = variable
 	}
 	variable = os.Getenv("CENSORPORT")
-	if len(variable) != 0 {
-		p, err := strconv.Atoi(variable)
-		if err == nil {
-			c.conf.CensorPort = p
-		}
+	if len(variable) != 0 {	
+			c.conf.CensorPort = int(tools.GetIntDef(variable, int64(c.conf.CensorPort)))		
 	}
 	variable = os.Getenv("Logdir")
 	if len(variable) != 0 {
