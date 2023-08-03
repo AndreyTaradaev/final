@@ -137,6 +137,10 @@ func (api *API) getcomments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ret, err := api.commentClient.Comments(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	jsn, err := json.Marshal(ret)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -438,14 +442,14 @@ func (api *API) headersMiddleware(next http.Handler) http.Handler {
 		if (r.URL.String() == "/") || strings.Contains(r.URL.String(), "swagger") {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			//logs.New().Debug("checked Path for current dir ", os.Getenv("PWD"))
-		}   else {
+		} else {
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		}
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		logs.New().Debug(r.Header)
 		logs.New().Debug(r.URL)
 		next.ServeHTTP(w, r)
-	
+
 	},
 	)
 }
