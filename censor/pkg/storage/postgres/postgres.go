@@ -25,7 +25,7 @@ type DB struct {
 
 // Конструктор  создания и подключения к БД.
 func New() (*DB, error) {
-	os.Setenv("CENSORDB", "postgres://postgres:1C_Db_post@172.16.0.44:5432/gocensor")
+	
 	connstr := os.Getenv("CENSORDB")
 	if connstr == "" {
 		return nil, errors.New("не указано подключение к БД в  переменной CENSORDB, формат  postgres://[user]:[passwd]@[host]:[port]/[database]")

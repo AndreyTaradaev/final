@@ -33,7 +33,41 @@
 					]
 				}
 			},
-			"response": []
+			"response": [
+				{
+					"name": "ListPage",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost/news/page/1?count=25",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"news",
+								"page",
+								"1"
+							],
+							"query": [
+								{
+									"key": "request_id",
+									"value": "2222",
+									"disabled": true
+								},
+								{
+									"key": "count",
+									"value": "25"
+								}
+							]
+						}
+					},
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": null
+				}
+			]
 		},
 		{
 			"name": "for web",
@@ -68,24 +102,6 @@
 						"news",
 						"detail",
 						"65222"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "List",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "localhost/news/list",
-					"host": [
-						"localhost"
-					],
-					"path": [
-						"news",
-						"list"
 					]
 				}
 			},

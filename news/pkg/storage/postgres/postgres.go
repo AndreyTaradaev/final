@@ -79,8 +79,6 @@ type DB struct {
 
 // Конструктор  создания и подключения к БД.
 func New() (*DB, error) {
-	os.Setenv("NEWSDB", "postgres://postgres:1C_Db_post@172.16.0.44:5432/gonews")
-
 	connstr := os.Getenv("NEWSDB")
 	if connstr == "" {
 		return nil, errors.New("не указано подключение к БД в  переменной NEWSDB, формат  postgres://[user]:[passwd]@[host]:[port]/[database]")

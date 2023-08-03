@@ -38,8 +38,6 @@ type DB struct {
 
 // Конструктор  создания и подключения к БД.
 func New() (*DB, error) {
-	os.Setenv("COMMENTDB", "postgres://postgres:1C_Db_post@172.16.0.44:5432/gocomments")
-
 	connstr := os.Getenv("COMMENTDB")
 	if connstr == "" {
 		return nil, errors.New("не указано подключение к БД в  переменной COMMENTDB, формат  postgres://[user]:[passwd]@[host]:[port]/[database]")

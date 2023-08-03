@@ -15,6 +15,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/gorilla/mux"
@@ -434,18 +435,19 @@ func (api *API) detail(w http.ResponseWriter, r *http.Request) {
 // headersMiddleware устанавливает заголовки ответа сервера.
 func (api *API) headersMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		if r.URL.String() == "/" {
+		if (r.URL.String() == "/") || strings.Contains(r.URL.String(), "swagger") {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		} else {
+			//logs.New().Debug("checked Path for current dir ", os.Getenv("PWD"))
+		}   else {
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		}
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		logs.New().Debug(r.Header)
 		logs.New().Debug(r.URL)
 		next.ServeHTTP(w, r)
-
-	})
+	
+	},
+	)
 }
 
 // Проверка  коментариев

@@ -11,7 +11,7 @@
    ],
    "request_period": 180,   	
 	"newsport" : 11200,    
-	"commentport": 10001,
+	"commentport": 11001,
 	"censorport": 12035,
 	"censorHost": "localhost",
 	"port" : 80,
