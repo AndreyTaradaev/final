@@ -66,6 +66,28 @@ and ($3=0 or "time" <=$3 )
 	%s  )
 	select count(*) from t 
 	;`
+	search string = `
+with t as ( SELECT  ID,Title,description,"time", url,hashrss    
+FROM "NewsRss" NR  where
+( $1 ='' or   ( -- поиск по в заголовке
+title  %s  '%%'||$1||'%%'))
+union 
+SELECT  ID,Title,description,"time", url,hashrss    
+FROM "NewsRss" NR  where
+( $1 ='' or   ( -- поиск по содержанию
+description  %s  '%%'||$1||'%%'))
+union
+SELECT  ID,Title,description,"time", url,hashrss   
+FROM "NewsRss" NR  where
+( $1 ='' or   ( -- поиск по ссылке 
+url  %s  '%%'||$1||'%%')))
+`
+
+	searchrow string = `select * from t 
+%s ;`
+	countsearch string = `select count(*) from t  %s ;
+`
+
 	row   = `  id, title, description, "time", url, hashrss  `
 	count = " count(*) "
 )
