@@ -1,0 +1,5 @@
+time="09-Aug-2023 17:30:01.87" level=info msg="запуск приложения" func="main.main()" file="comcmd.go:36" app=comcmd
+time="09-Aug-2023 17:30:01.91" level=info msg="командная строка  -config E:\\Go\\skilfactory\\module40\\final\\bin\\comment/config.json -debug" func="main.main()" file="comcmd.go:37" app=comcmd
+time="09-Aug-2023 17:30:01.91" level=debug msg=" Параметры конфигурации commentport: 10001, logdir: ./ " func="main.main()" file="comcmd.go:38" app=comcmd
+time="09-Aug-2023 17:30:01.91" level=debug msg="настрока параметров соединения  сервера" func="main.main()" file="comcmd.go:39" app=comcmd
+time="09-Aug-2023 17:30:01.92" level=fatal msg="failed to listen: не указано подключение к БД в  переменной COMMENTDB, формат  postgres://[user]:[passwd]@[host]:[port]/[database]" func="main.main()" file="comcmd.go:47" app=comcmd
